@@ -20,14 +20,17 @@ Rendered version with a plain-English toggle: [`magi-babel.html`](magi-babel.htm
 
 ## Progress
 
-**Phase H-00 · groundwork**, nearly complete. MAGI runs Ubuntu Server 26.04.1, survives
-an unattended reboot, and is reachable over Tailscale. Nothing containerised yet.
+**Phase H-01 · the spine.** H-00 is done: MAGI runs Ubuntu Server 26.04.1, boots in 14 s,
+reaches the network over campus wired with WPA2-Enterprise wifi behind it as a fallback,
+and answers only on the tailnet — port 22 is closed on the LAN. **One H-00 item is
+carried forward: the 2 × 8 GB DDR4-3200 upgrade, which blocks H-08 and nothing before it.**
+Nothing containerised yet.
 
 ### MAGI — the homelab
 
 | | Phase | | Cost |
 |:--|:--|:--|--:|
-| ⬜ | **H-00** | Groundwork — RAM, DHCP reservation, SSH keys, `git init` | ₹0–4k |
+| ✅ | **H-00** | Groundwork — install, network, hardening, `git init` · *RAM upgrade still to buy* | ₹0–4k |
 | ⬜ | **H-01** | The Spine — Docker, Tailscale, Caddy, wildcard TLS | ₹800/yr |
 | ⬜ | **H-02** | The Nervous System — Mosquitto, the MQTT topic tree | ₹0 |
 | ⬜ | **H-03** | The Glass — Prometheus, Grafana, Loki, Uptime Kuma | ₹0 |

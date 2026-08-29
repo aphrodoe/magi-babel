@@ -9,7 +9,7 @@ rather than assuming; don't restate it back into this file.**
 
 ## Where I am right now
 
-- **Phase: H-00 (groundwork), nearly complete.** Nothing containerised yet.
+- **Phase: H-01 (the spine).** H-00 closed 2026-08-29. Nothing containerised yet.
 - **MAGI is up:** HP 15s-fq5xxx, i5-1235U (10c/12t, Iris Xe), 2 × 4 GB DDR4-3200 with
   **both slots full** (32 GB ceiling), 512 GB NVMe, **no Ethernet port**, battery 100%.
   Ubuntu Server 26.04.1 LTS, LVM no LUKS, root expanded to 466 G. Keys-only SSH, ufw
@@ -41,7 +41,9 @@ rather than assuming; don't restate it back into this file.**
 - **A power cut longer than the battery (~3–4 h) needs a human.** The BIOS has no
   AC-restore option, so MAGI stays off until the power button is pressed. It shuts down
   cleanly at 2% so nothing is lost. Don't design around auto-recovery from a long outage.
-- Outstanding H-00: RAM pair not bought. Blocks H-08 only; everything else is done.
+- **Carried over from H-00: the RAM.** 2 × 8 GB DDR4-3200, a matched pair replacing both
+  4 GB sticks (§01). Nothing before H-08 needs it, which is why H-00 was closed without
+  it — but it is the one physical purchase still outstanding.
 
 <!-- Keep this block current. It is the one thing a fresh session can't infer. -->
 
