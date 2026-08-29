@@ -345,6 +345,12 @@ Wiring notes: inject 5 V at both ends on runs over 2 m, a 330–470 Ω resistor 
 data line, a 1000 µF cap across the supply, and **common ground between the ESP32
 and the PSU** or you'll spend an evening debugging ghost flickers.
 
+**You also need somewhere to do this.** H-05 is the first phase with a soldering iron in
+it, and a shared desk with your main laptop on it is not the place. See `PURCHASES.md` —
+the answer is a boltless slotted-angle rack with one shelf set to desk height, which is
+also where MAGI and everything after it lives. **Never solder on a bare steel shelf:** it
+shorts every exposed pad on the underside of the board. Ply, then a silicone mat.
+
 **And one part missing from every version of this plan: a `74AHCT125` level shifter
 (~₹50).** The ESP32-S3 drives 3.3 V logic; WS2812B wants 5 V. It frequently *appears*
 to work without one and then fails intermittently on longer runs — which is the ghost

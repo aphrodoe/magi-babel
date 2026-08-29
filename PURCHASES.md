@@ -42,6 +42,55 @@ R6: **buy what unblocks the next phase, nothing else.** The exception is AliExpr
 
 ---
 
+## The rack — buy once, keep forever
+
+**Boltless slotted-angle steel rack**, roughly **2 ft wide × 1.5 ft deep × 5 ft high,
+4–5 shelves.** ₹2,500–5,000 from a local fabricator, ₹5,000–9,500 for a branded
+flat-pack on Flipkart/Amazon. Plus ~₹500 for a plywood or HDF board cut to one shelf.
+
+**Size it so one shelf sits at ~75 cm — that shelf is the workbench.** Slotted angle
+adjusts every 1.5 inches, so this costs nothing extra and turns one purchase into both
+the equipment rack and the soldering bench you need from H-05 onward.
+
+**Why this and not a 10″ mini rack:** none of this lab's hardware is rack-mount — a
+laptop, a USB HDD, a mini-PC, a switch. A DeskPi RackMate T1 lands at ₹12–18k after
+customs and still needs a shelf or a 3D print for every single item, and gives no work
+surface at all. It is the aesthetic answer to the smallest part of the problem.
+
+**Why it lasts to H-11:**
+
+- **Open frame = ventilation.** MAGI runs 24/7. A closed cabinet cooks it; this doesn't.
+- **Extends instead of being replaced.** Slotted angle is a warehouse system — buy more
+  angle and another shelf, make it taller or wider. It grows into H-10's second machine
+  and switch rather than being outgrown by them.
+- **Flat-packs.** You will change rooms at least twice before H-11. It disassembles with
+  no special tools and no lost parts.
+- **Locally repairable.** Every hardware market in India cuts and sells this. No import,
+  no lead time, no single vendor.
+
+**Two things that are easy to get wrong:**
+
+1. **Never work on a powered board directly on a bare steel shelf.** It is a conductive
+   surface across every exposed pad underneath — the classic way to short a project you
+   just finished. The work shelf gets ply or HDF, then the silicone mat, always.
+2. **Heat and drives don't share a shelf.** Keep the soldering iron and the 5 V LED
+   supply off whatever shelf holds the backup HDD and MAGI.
+
+Worth adding at the same time: a **vertical laptop stand** (₹300–800) so MAGI stands on
+its edge rather than lying flat — roughly halves its footprint, and keeps the bottom
+intake clear as long as it isn't pushed against a wall. A **power strip cable-tied to an
+upright**, and **velcro ties** rather than zip ties, so re-cabling in H-10 isn't a
+scissors job.
+
+| ✓ | Item | Where | Target ₹ | Paid ₹ |
+|:-:|---|---|--:|--:|
+| ⬜ | Boltless slotted-angle rack, 2×1.5×5 ft, 4–5 shelves | Local fabricator, Flipkart, Amazon.in | 2,500–5,000 | ____ |
+| ⬜ | Ply/HDF board cut to one shelf — the work surface | Local timber shop | ~500 | ____ |
+| ⬜ | Vertical laptop stand for MAGI | Amazon.in | 300–800 | ____ |
+| ⬜ | Power strip + velcro cable ties | Amazon.in | 400–800 | ____ |
+
+---
+
 ## Deferred — with the trigger that un-defers it
 
 | Item | ₹ | Buy when |
