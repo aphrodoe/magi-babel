@@ -30,11 +30,24 @@ echo "· ssh: password auth off, root login off"
 
 # --- 2. firewall ----------------------------------------------------------
 # Order matters: allow SSH *before* enabling, or enabling ufw cuts this session.
-ufw allow OpenSSH                     >/dev/null
 ufw allow in on tailscale0            >/dev/null
 ufw allow 41641/udp comment 'tailscale direct peers' >/dev/null
+
+# Port 22 on the physical NIC is only needed to bootstrap. Once the tailnet is up
+# it is pure exposure — MAGI sits on a shared campus /21 with a few thousand
+# neighbours, and every one of them can currently reach its SSH port. So: open 22
+# broadly only while there is no other way in, and close it the moment there is.
+# Self-healing on a rebuild — the first run opens it, a later run closes it.
+# Locking yourself out is not a risk here: MAGI is a laptop with its own keyboard.
+if tailscale status >/dev/null 2>&1 && ip -4 addr show tailscale0 2>/dev/null | grep -q 'inet '; then
+  ufw --force delete allow OpenSSH >/dev/null 2>&1 || true
+  echo "· ufw: SSH restricted to the tailnet; port 22 closed on the campus LAN"
+else
+  ufw allow OpenSSH >/dev/null
+  echo "· ufw: OpenSSH open to all — tailnet not up, keeping a way in"
+fi
 ufw --force enable                    >/dev/null
-echo "· ufw: default-deny inbound; SSH, tailscale0 and 41641/udp allowed"
+echo "· ufw: default-deny inbound; tailscale0 and 41641/udp allowed"
 
 # --- 3. automatic security updates ---------------------------------------
 cat > /etc/apt/apt.conf.d/20auto-upgrades <<'EOF'
