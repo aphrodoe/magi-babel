@@ -43,6 +43,24 @@ rather than assuming; don't restate it back into this file.**
 - **Commits:** present tense, say *why* when it isn't obvious. Git covers what changed;
   the runbook covers what broke.
 
+## Commit and push cadence
+
+- **Commit whenever something works.** A container comes up healthy, a config finally
+  does what it should, a script runs clean — that's a commit. Typically a few per
+  session, not one at the end. Sessions die and machines reboot; a checkpoint you can
+  return to beats a tidy history.
+- **A broken checkpoint is fine to commit** — just say so in the message
+  (`WIP: caddy not issuing certs yet`). Untracked work is the only real failure mode.
+- **Push at the end of every session, minimum.** `/wrap` does it. This matters more
+  here than in a normal project: R2 rebuilds the entire lab on Proxmox *from this repo*,
+  and R3's whole premise is that the machine can die. A commit sitting unpushed on the
+  laptop protects you from nothing.
+- **Work on `main`.** Solo repo, no review, branches are ceremony. The exception is the
+  Proxmox rebuild — branch that one, since it's the change that can leave you with
+  neither the old lab nor the new one.
+- **Never `git add -A` blind after touching configs.** Check `git status` first; new
+  services write credentials into places you didn't expect.
+
 ## How to work with me
 
 - **I'm learning this, not maintaining it.** Explain the reasoning, don't just hand me

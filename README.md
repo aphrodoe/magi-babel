@@ -1,33 +1,67 @@
 # MAGI & BABEL-2588
 
-Two laboratories with opposite failure modes, and the tension between them is the point.
+**MAGI** is a homelab — an always-on box on a shelf, judged by uptime.
+**BABEL-2588** is a cyberdeck — a portable field computer, judged by self-sufficiency.
 
-**MAGI** is the homelab — an always-on box on a shelf, judged by **uptime**. Its virtue
-is that it is boring, documented, and still running in March. It teaches how computers
-work *together*.
+Opposite failure modes on purpose. One teaches how computers work *together*; the other,
+how they work *with the physical world*. Everything here is built to a single rule:
 
-**BABEL-2588** is the cyberdeck — a portable, self-contained field computer, judged by
-**self-sufficiency**. Its virtue is that you can open it on a hill with no signal and it
-is still the most interesting object in the bag. It teaches how computers work *with the
-physical world*.
+> **A thing is only cool if it is legible.** Ten seconds, no explanation, a stranger can
+> tell something is happening and roughly what.
 
-> **A thing is only cool if it is legible.**
-> Ten seconds, no explanation, a stranger can tell something is happening and roughly
-> what. An LED strip where amber means a container died is cool. RGB cycling rainbow is
-> not. Six Grafana panels you actually read is cool. Forty panels is not.
+An LED strip where amber means a container died passes. RGB cycling rainbow does not.
+Six Grafana panels you actually read passes. Forty does not.
 
-## Start here
+📖 **[`MASTERPLAN.md`](MASTERPLAN.md)** — the full plan: ground rules, all 23 phases, the
+learning path paired to each one, hardware verdicts, and costs in ₹.
+Rendered version with a plain-English toggle: [`magi-babel.html`](magi-babel.html).
 
-**[`MASTERPLAN.md`](MASTERPLAN.md)** — the whole thing. Thesis, six ground rules, every
-build phase (H-00…H-11 for MAGI, CD-00…CD-10 for BABEL-2588), the learning path paired to
-each phase, hardware dossier with verdicts, expansions, timeline, and costs in ₹.
+---
 
-[`magi-babel.html`](magi-babel.html) is the same document as a rendered page, with a
-plain-English toggle for the dense sections.
+## Progress
 
-**Current phase** lives in [`CLAUDE.md`](CLAUDE.md), and the working history is in
-[`runbook/`](runbook/) — one log per phase, three lines per session: what I did, what
-broke, what I'd do differently.
+**Phase H-00 · groundwork.** Nothing deployed yet.
+
+### MAGI — the homelab
+
+| | Phase | | Cost |
+|:--|:--|:--|--:|
+| ⬜ | **H-00** | Groundwork — RAM, DHCP reservation, SSH keys, `git init` | ₹0–4k |
+| ⬜ | **H-01** | The Spine — Docker, Tailscale, Caddy, wildcard TLS | ₹800/yr |
+| ⬜ | **H-02** | The Nervous System — Mosquitto, the MQTT topic tree | ₹0 |
+| ⬜ | **H-03** | The Glass — Prometheus, Grafana, Loki, Uptime Kuma | ₹0 |
+| ⬜ | **H-04** | The House — Jellyfin, Immich, Vaultwarden, Paperless | ₹0 |
+| ⬜ | **H-05** | Ambient Telemetry — ESP32-S3, LED strip, wall panel | ₹1.5–2.5k |
+| ⬜ | **H-06** | The Sky Log — RTL-SDR, ADS-B, weather satellites | ₹4.8–5.5k |
+| ⬜ | **H-07** | The Range — Suricata, Juice Shop, the security lab | ₹0 |
+| ⬜ | **H-08** | The Oracle — local LLM, RAG over the runbook | ₹0 |
+| ⬜ | **H-09** | The Eye — cameras, Frigate detection | ₹0–2.5k |
+| ⬜ | **H-10** | The Cluster — k3s, GitOps, the second machine | ₹20–35k |
+| ⬜ | **H-11** | Final Form | — |
+
+### BABEL-2588 — the cyberdeck
+
+| | Phase | | Cost |
+|:--|:--|:--|--:|
+| ⬜ | **CD-00** | The Brain Bench — SBC selection and burn-in | ₹15–19k |
+| ⬜ | **CD-01** | The Vault — Kiwix, the offline payload | ₹0 |
+| ⬜ | **CD-02** | The Shell — enclosure, power, **ship v1** | ₹12–22k |
+| ⬜ | **CD-03** | Physical UI — switches, panel meter, labels | ₹2.5–4.5k |
+| ⬜ | **CD-04** | The Module Bay — the cartridge interface | ₹2–3.5k |
+| ⬜ | **CD-05** | Cartridge: RF | — |
+| ⬜ | **CD-06** | Cartridge: Mesh — Meshtastic, IN865 | ₹5–16k |
+| ⬜ | **CD-07** | Cartridge: CAN | ₹1.5–3k |
+| ⬜ | **CD-08** | Cartridge: Environment | ₹5.5–8k |
+| ⬜ | **CD-09** | Cartridge: Crypto | — |
+| ⬜ | **CD-10** | Field Doctrine | — |
+
+<!-- /wrap updates the phase line and ticks these at phase boundaries. -->
+
+## Running
+
+Nothing yet. Services land here as they come up, with what each one is for.
+
+---
 
 ## Layout
 
@@ -36,18 +70,20 @@ compose/      one directory per stack — compose.yaml + .env.example
 config/       per-service config: caddy, prometheus, mosquitto, loki
 dashboards/   exported Grafana JSON
 ansible/      later, when sshing in by hand stops being charming
-runbook/      how to restore, how to rotate, what broke and why
-secrets/      gitignored — real values here, .env.example in the repo
+runbook/      one log per phase — what I did, what broke, what I'd do differently
+secrets/      gitignored; real values here, .env.example in the repo
 ```
 
-Config files over GUI settings, everywhere. A setting that lives only in a web UI's
+**Config files over GUI settings, everywhere.** A setting that lives only in a web UI's
 database is a setting that gets lost in the rebuild — and there *is* a rebuild: the whole
-lab moves from Ubuntu + Docker to Proxmox around month six, from this repo, on purpose.
+lab moves from Ubuntu + Docker to Proxmox around month six, from this repo, deliberately.
 
-## Naming
+**Naming.** Hosts, MQTT topics, Grafana titles and panel labels all use the callsigns.
+MQTT roots are `magi/…` and `babel-2588/…`. One scheme everywhere — the consistency *is*
+the aesthetic.
 
-Hosts, MQTT topics, Grafana titles and panel labels all use the callsigns. MQTT roots are
-`magi/…` and `babel-2588/…`. One scheme everywhere — the consistency *is* the aesthetic.
+**Working history** is in [`runbook/`](runbook/); conventions and current state in
+[`CLAUDE.md`](CLAUDE.md).
 
 ---
 

@@ -47,9 +47,12 @@ The user's note for this session: $ARGUMENTS
    what felt wrong, which nothing in the diff can tell you.
 
 4. **After they confirm**, write it, then:
-   - Update the `Phase:` line in CLAUDE.md **only if the phase actually changed.**
-     Not every session. That file is auto-loaded into every context and should stay
-     small and stable.
+   - **If and only if the phase actually changed:** update the `Phase:` line in
+     CLAUDE.md, tick the completed phase's ⬜ → ✅ in the README progress board, and
+     update the README's status line under `## Progress`. Not every session — CLAUDE.md
+     is auto-loaded into every context and should stay small and stable.
+   - If a service came up for the first time, add a line for it under `## Running` in
+     the README saying what it's for.
    - `git add -A`, commit with a message saying what was done and *why* where it isn't
      obvious, and `git push`.
    - Before committing, confirm nothing sensitive is staged:
