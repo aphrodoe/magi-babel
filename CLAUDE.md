@@ -9,12 +9,17 @@ rather than assuming; don't restate it back into this file.**
 
 ## Where I am right now
 
-- **Phase: H-00 (groundwork).** Nothing deployed yet. Laptop still on Windows 11.
-- Hardware surveyed 2026-08-29: HP 15s-fq5xxx, i5-1235U (10c/12t, Iris Xe), 2 × 4 GB
-  DDR4-3200 **both slots full** (32 GB ceiling), 512 GB NVMe, **no Ethernet port**,
-  battery at 100% health. See §01 "The very first command".
-- Next concrete step: buy 2 × 8 GB DDR4-3200 (matched pair — dual channel matters for
-  H-08) and a USB-Ethernet adapter, then wipe Windows for Ubuntu Server.
+- **Phase: H-00 (groundwork), nearly complete.** Nothing containerised yet.
+- **MAGI is up:** HP 15s-fq5xxx, i5-1235U (10c/12t, Iris Xe), 2 × 4 GB DDR4-3200 with
+  **both slots full** (32 GB ceiling), 512 GB NVMe, **no Ethernet port**, battery 100%.
+  Ubuntu Server 26.04.1 LTS, LVM no LUKS, root expanded to 466 G. Keys-only SSH, ufw
+  default-deny, unattended-upgrades, lid-close ignored (`scripts/h00-harden.sh`).
+- **Reach it with `ssh magi`** — Tailscale (H-01, pulled forward) bridges cipher and
+  magi across different networks. On cipher, Tailscale and Cloudflare WARP coexist only
+  because `*.tailscale.com` is in WARP's split-tunnel exclude list; don't reset that.
+- Outstanding H-00: RAM pair and USB-Ethernet not bought, no DHCP reservation,
+  `apt upgrade` pending non-mobile data, MAGI's permanent network undecided (campus
+  wifi is WPA2-Enterprise; wired is captive-portal or 802.1X, not yet determined).
 
 <!-- Keep this block current. It is the one thing a fresh session can't infer. -->
 

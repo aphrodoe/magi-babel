@@ -20,7 +20,8 @@ Rendered version with a plain-English toggle: [`magi-babel.html`](magi-babel.htm
 
 ## Progress
 
-**Phase H-00 · groundwork.** Nothing deployed yet.
+**Phase H-00 · groundwork**, nearly complete. MAGI runs Ubuntu Server 26.04.1 and is
+reachable over Tailscale. Nothing containerised yet.
 
 ### MAGI — the homelab
 
@@ -59,7 +60,14 @@ Rendered version with a plain-English toggle: [`magi-babel.html`](magi-babel.htm
 
 ## Running
 
-Nothing yet. Services land here as they come up, with what each one is for.
+| On | Service | For |
+|:--|:--|:--|
+| magi | **Tailscale** | The access fabric. `ssh magi` from anywhere, no port-forwarding. |
+| magi | **OpenSSH** | Keys only. Password auth off. |
+| magi | **ufw** | Default-deny inbound; SSH, `tailscale0`, 41641/udp allowed. |
+| magi | **unattended-upgrades** | Automatic security patches. |
+
+Containerised services land here as they come up.
 
 ---
 
