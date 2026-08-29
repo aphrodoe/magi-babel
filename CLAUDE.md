@@ -32,6 +32,21 @@ rather than assuming; don't restate it back into this file.**
    borrowed hardware. It buys artifacts, not architecture.
 5. **Buy the thing that unblocks the next phase, nothing else** (R6) — except long-lead
    AliExpress parts, ordered one phase early.
+6. **Never edit configs directly on MAGI.** Edit here on `cipher`, commit, push, then
+   `git pull` on MAGI and bring the stack up. A file changed over SSH exists only on a
+   disk R3 assumes can die, and it silently breaks R2 — the Proxmox rebuild's whole
+   premise is that the lab regenerates *from this repo*. Run commands on MAGI over SSH
+   freely; just don't let it become the only place a config lives.
+
+## The two machines
+
+- **`cipher`** — this laptop. The workstation: where the repo lives, where edits happen,
+  where Claude Code runs. Dual-boots Windows; `/` is ext4 and runs tight on space.
+- **`magi`** — the HP 15s, Ubuntu Server, headless. A deployment target driven over SSH.
+  Its RAM belongs to services, not to tooling.
+
+The loop: `edit on cipher → commit → push → git pull on magi → docker compose up -d`.
+GitOps by hand until H-10 automates it with Flux.
 
 ## Conventions
 
