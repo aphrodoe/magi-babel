@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # H-00 hardening for MAGI. Idempotent — safe to run more than once.
-#   sudo ./h00-harden.sh
+#   sudo ~/homelab/scripts/magi/20-harden.sh
 set -euo pipefail
 
 [[ $EUID -eq 0 ]] || { echo "run this with sudo"; exit 1; }

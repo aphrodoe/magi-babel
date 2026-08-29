@@ -13,15 +13,15 @@ rather than assuming; don't restate it back into this file.**
 - **MAGI is up:** HP 15s-fq5xxx, i5-1235U (10c/12t, Iris Xe), 2 × 4 GB DDR4-3200 with
   **both slots full** (32 GB ceiling), 512 GB NVMe, **no Ethernet port**, battery 100%.
   Ubuntu Server 26.04.1 LTS, LVM no LUKS, root expanded to 466 G. Keys-only SSH, ufw
-  default-deny, unattended-upgrades, lid-close ignored (`scripts/h00-harden.sh`).
+  default-deny, unattended-upgrades, lid-close ignored (`scripts/magi/20-harden.sh`).
 - **Reach it with `ssh magi`** — Tailscale (H-01, pulled forward) bridges cipher and
   magi across different networks. On cipher, Tailscale and Cloudflare WARP coexist only
   because `*.tailscale.com` is in WARP's split-tunnel exclude list; don't reset that.
 - **Network is settled.** MAGI sits on campus wired via a USB-C Ethernet adapter. The
   wall port is **open** — no 802.1X, no captive portal, no proxy, and UDP passes (probed
-  with `scripts/net-probe.sh`). Config is `config/netplan/10-magi-net.yaml`, matching
+  with `scripts/magi/diag-net.sh`). Config is `config/netplan/10-magi-net.yaml`, matching
   `en*` so the adapter and a phone tether are interchangeable; install it with
-  `scripts/apply-netplan.sh`, never by editing `/etc/netplan` directly.
+  `scripts/magi/10-network.sh`, never by editing `/etc/netplan` directly.
 - **MAGI's address is `100.94.219.53`, not its DHCP lease.** Campus DHCP is out of our
   control and the lease will move; the Tailscale IP and the MagicDNS name won't. Anything
   that needs to name MAGI names it that way. This is why no DHCP reservation is needed.
@@ -68,6 +68,13 @@ GitOps by hand until H-10 automates it with Flux.
 - **Layout:** `compose/` one dir per stack (`compose.yaml` + `.env.example`) ·
   `config/` per-service config · `dashboards/` exported Grafana JSON ·
   `ansible/` later · `runbook/` how to restore, what broke, why · `secrets/` gitignored.
+- **Scripts:** `scripts/<host>/` — one directory per machine, because a rebuild asks
+  "what do I run on the new MAGI, in what order?" Numeric prefixes answer the *order*
+  part: `10-network.sh`, `20-harden.sh`, run top to bottom on a bare box. **The number
+  is run order, not the phase that introduced it** — these get re-run forever, and git
+  log already records which phase they came from. Diagnostics that answer a question
+  rather than change the box are `diag-*.sh`, which sorts after the numbered ones.
+  Every script is idempotent: re-running it is how you apply a change.
 - **Config files over GUI settings** (R1). A setting that lives only in a web UI's
   database is a setting that gets lost in the rebuild.
 - **Naming:** hosts, MQTT topics, Grafana titles and panel labels all use the callsigns.

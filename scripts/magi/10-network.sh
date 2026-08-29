@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Install MAGI's netplan config from the repo and apply it, reverting if the
-# network doesn't come back. Run: sudo ~/homelab/scripts/apply-netplan.sh
+# network doesn't come back. Run: sudo ~/homelab/scripts/magi/10-network.sh
 set -euo pipefail
 [[ $EUID -eq 0 ]] || { echo "run with sudo"; exit 1; }
-SRC="$(cd "$(dirname "$0")/.." && pwd)/config/netplan/10-magi-net.yaml"
+SRC="$(cd "$(dirname "$0")/../.." && pwd)/config/netplan/10-magi-net.yaml"
 BAK=$(mktemp -d)
 
 cp -a /etc/netplan/. "$BAK"/ 2>/dev/null || true

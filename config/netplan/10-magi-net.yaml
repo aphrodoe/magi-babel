@@ -1,10 +1,10 @@
-# MAGI networking. Single source of truth — install with scripts/apply-netplan.sh.
+# MAGI networking. Single source of truth — install with scripts/magi/10-network.sh.
 # Matches any wired interface (en*), which covers both the USB-C ethernet adapter
 # and a phone tether, so swapping the cable needs no config change.
 # optional: true is INERT on this netplan version — it emits no RequiredForOnline=no,
 # and networkctl still reports "Required For Online: yes". Kept because it states the
 # intent and may start working after an upgrade; the thing actually stopping a 2-minute
-# boot stall is the wait-online drop-in in scripts/h00-harden.sh. Check both if boot
+# boot stall is the wait-online drop-in in scripts/magi/20-harden.sh. Check both if boot
 # ever hangs on the network.
 network:
   version: 2

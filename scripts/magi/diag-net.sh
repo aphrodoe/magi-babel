@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Diagnose a campus wired port: open / captive portal / 802.1X.
 # Run on MAGI as root with the ethernet adapter plugged into the wall port:
-#   sudo ~/homelab/scripts/net-probe.sh [interface]
+#   sudo ~/homelab/scripts/magi/diag-net.sh [interface]
 # Leaves a working DHCP config in place if the port turns out to be open.
 set -uo pipefail
 [[ $EUID -eq 0 ]] || { echo "run with sudo"; exit 1; }
 
-LOG=/root/net-probe.log
+LOG=/root/diag-net.log
 exec > >(tee "$LOG") 2>&1
 PROBE=/etc/netplan/99-probe.yaml
 
