@@ -128,13 +128,71 @@ useful for years, not to be bought in one order. Soldering iron already owned.
 
 ---
 
-## Where to look
+## How to order — two websites and one local trip
 
-**Robu** widest catalogue, fair mid pricing · **Sunrom / Evelta** passives, ICs, small parts ·
-**Amazon.in / Flipkart** commodity — drives, PSUs, tools, almost always cheapest ·
-**Silverline / Element14 India** official Pi · **Fab.to.Lab** SDR and RF ·
-**Robocraze / ThinkRobotics** varies weekly · **AliExpress** Heltec, LilyGO, Geiger —
-3–6 weeks plus customs, order early, never mid-build.
+Everything to H-05 groups into **two orders and one visit**. Ordering is not free: each
+extra vendor is another delivery to wait on, another return policy, another chance one
+missing ₹50 part blocks an evening. Consolidate.
+
+### Order 1 — Amazon.in · commodity, fast, easy returns
+
+Drives, tools and household goods, where brand and return policy matter more than
+catalogue depth.
+
+`2 TB external HDD (Seagate Expansion / WD Elements)` · `vertical laptop stand` ·
+`power strip` · `velcro cable ties` · `digital multimeter` · `heat-resistant silicone
+mat` · `safety glasses` · `component organiser box` · *`boltless rack`, only if no local
+fabricator*
+
+### Order 2 — Robu.in · every electronic part in one basket
+
+The widest catalogue in India, and the reason this stays at two sites — it covers the
+modules, the consumables and the hand tools together.
+
+`WS2812B 5 m 60 LED/m` · `5 V 10 A SMPS` · `2.4–2.8" ILI9341 SPI TFT` ·
+`74AHCT125` *(see below)* · `chisel + conical tips` · `63/37 solder 0.8 mm` · `flux` ·
+`brass tip cleaner` · `desoldering braid` · `flush cutters` · `wire strippers` ·
+`needle-nose pliers` · `tweezers` · `helping hands` · `22 AWG silicone wire` ·
+`JST-SM 3-pin pairs` · `Dupont jumpers` · `pin headers` · `heat-shrink assortment` ·
+`breadboards` · `perfboard` · `resistor assortment` · `capacitor assortment incl.
+1000 µF/16 V` · `1N4001 diodes` · `IRLZ44N` · `inline fuse holder + fuses`
+
+> **Robu caveat:** widest catalogue, but a documented pattern of complaints about
+> packaging damage and difficult returns. **Photograph the unboxing.** If you would
+> rather trade breadth for service, **Robocraze** is an authorised Arduino/Pi/Element14
+> reseller with a better service reputation and a narrower catalogue — you would then
+> split the consumables across two orders.
+
+### Trip 3 — local hardware market · the rack
+
+Slotted angle cut to your dimensions, plus a ply or HDF board for the work shelf.
+Cheaper than the branded flat-packs and sized exactly to your room. Not a website,
+so the site count stays at two.
+
+### The one part that might force a third site
+
+**`74AHCT125`** (or `74HCT245`). If Robu is out of stock, **Evelta** is the right
+source — Mumbai, direct partnerships with TI and ST, and counterfeit logic ICs are a
+genuine problem in this market.
+
+**Or avoid the third order entirely with a diode.** WS2812B reads logic-high at
+0.7 × VDD, which is 3.5 V on a 5 V rail — just above the ESP32's 3.3 V, which is why it
+works until it doesn't. Feed **only the first LED** through a `1N4001` (already in the
+Robu basket): its VDD drops to ~4.3 V, its threshold to ~3.0 V, and 3.3 V data is
+comfortably valid. Inject full 5 V into the strip further along, which you are doing
+anyway on a 5 m run. Slightly less robust than a real buffer, and free.
+
+---
+
+## Vendor reference
+
+**Amazon.in / Flipkart** commodity — drives, PSUs, tools; best returns ·
+**Robu** widest electronics catalogue; inspect on arrival · **Robocraze** authorised
+Arduino/Pi/Element14, better service, narrower range · **Evelta** authenticity, direct
+manufacturer partnerships, 24 h dispatch — the one to trust for real ICs ·
+**Sunrom** passives and small parts · **Silverline / Element14 India** official Pi ·
+**Fab.to.Lab** SDR and RF · **AliExpress** Heltec, LilyGO, Geiger — 3–6 weeks plus
+customs, order early, never mid-build.
 
 *Robu, Amazon.in and Flipkart all block automated price checks, so every figure here
 was set by hand and should be treated as a target to beat, not a quote.*
