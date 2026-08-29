@@ -1,0 +1,17 @@
+# Secrets — never committed. See CLAUDE.md.
+*.env
+.env
+!*.env.example
+secrets/*
+!secrets/README.md
+*.key
+*.pem
+
+# Service state / bind mounts — backed up by restic (R3), not by git.
+data/
+*/data/
+volumes/
+
+# Noise
+*.log
+.DS_Store
