@@ -64,6 +64,22 @@ echo "· sleep/suspend/hibernate: masked"
 systemctl restart systemd-logind
 echo "· logind restarted — lid setting is live"
 
+# netplan's `optional: true` did not produce RequiredForOnline=no on this box
+# (networkctl still reports "Required For Online: yes"), so boot blocks in
+# systemd-networkd-wait-online for its full 120s default when the switch is down
+# — which is exactly the state after a power cut, since the router takes ~5min to
+# come back and MAGI boots faster than that. Anything ordered after
+# network-online.target (Docker, from H-01 on) inherits that stall.
+# --any: proceed as soon as one link is up, rather than all of them.
+mkdir -p /etc/systemd/system/systemd-networkd-wait-online.service.d
+cat > /etc/systemd/system/systemd-networkd-wait-online.service.d/10-magi-timeout.conf <<'EOF'
+[Service]
+ExecStart=
+ExecStart=/usr/lib/systemd/systemd-networkd-wait-online --any --timeout=20
+EOF
+systemctl daemon-reload
+echo "· wait-online: capped at 20s, --any (was an unbounded 120s wait)"
+
 # The battery is MAGI's UPS, so the critical-battery action matters. Stock is
 # HybridSleep — which we just masked, so upower would try it, fail, and let the
 # box hard-die at 0%. Hibernate isn't an alternative either: swap (4G) is smaller
