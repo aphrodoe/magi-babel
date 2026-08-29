@@ -38,8 +38,10 @@ rather than assuming; don't restate it back into this file.**
   tailnet is ever down, use MAGI's own keyboard — it is a laptop.
 - **MAGI has no repo of its own to edit** — `~/homelab` is a read-only-deploy-key clone
   of this repo. `git pull` there; pushes come from cipher.
-- Outstanding H-00: RAM pair not bought (blocks H-08 only); BIOS not yet checked for an
-  AC-restore option, which is the last power-cut gap.
+- **A power cut longer than the battery (~3–4 h) needs a human.** The BIOS has no
+  AC-restore option, so MAGI stays off until the power button is pressed. It shuts down
+  cleanly at 2% so nothing is lost. Don't design around auto-recovery from a long outage.
+- Outstanding H-00: RAM pair not bought. Blocks H-08 only; everything else is done.
 
 <!-- Keep this block current. It is the one thing a fresh session can't infer. -->
 

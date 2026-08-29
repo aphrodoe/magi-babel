@@ -175,6 +175,14 @@ Before a single container.
   a desktop doesn't. Don't buy a UPS.
   **Verified on this machine:** 41,050 mWh design, 41,050 mWh full charge, 2 cycles —
   100% health, roughly 3–4 hours of ride-through at idle. Best case, confirmed.
+  **And the limit, checked in the BIOS:** this firmware has no AC-restore option, so an
+  outage that outlasts the battery leaves MAGI *off* until someone presses the power
+  button. It shuts down cleanly at 2% rather than hard-dying — the stock upower action
+  was `HybridSleep`, which H-00's own sleep-masking had quietly made impossible — so
+  nothing is corrupted. But a cut longer than ~4 h needs a human. **This is the one
+  failure mode in the lab that no configuration can close**, and it's the price of a
+  laptop rather than a machine with server firmware. Worth knowing before R2 assumes
+  otherwise.
 - SSH keys only, password auth off, `ufw` default-deny, `unattended-upgrades` on.
 - `git init` the repo per R1, and start `runbook/000-log.md` per R5 — three lines a
   session: what you did, what broke, what you'd do differently.

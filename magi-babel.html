@@ -546,7 +546,8 @@ dl.glosslist{margin:20px 0}
       <li><strong>Campus wall port is open</strong> — no 802.1X, no captive portal, no proxy, UDP passes. Verified, not assumed.</li>
       <li><strong><s>DHCP reservation</s> — dropped.</strong> It assumed a router you administer. Tailscale's <code>100.x</code> address and MagicDNS name survive every network, which beats a reservation that holds on one LAN. Never write a campus IP into a compose file.</li>
       <li><strong>Lid-close behaviour</strong>: <code>HandleLidSwitch=ignore</code> in <code>/etc/systemd/logind.conf</code>. Lid shut, screen off, machine awake.</li>
-      <li><strong>The laptop battery is your UPS.</strong> A laptop homelab has built-in power protection a desktop doesn't. Don't buy a UPS.</li>
+      <li><strong>The laptop battery is your UPS.</strong> 41,050 mWh, 100% health, ~3–4 h of ride-through at idle. Don't buy a UPS.</li>
+      <li><strong>But a cut longer than the battery needs a human.</strong> No AC-restore option in this BIOS, so MAGI stays off until the power button is pressed. It shuts down cleanly at 2% — nothing is lost, but nothing auto-recovers either. The one failure mode no config can close.</li>
       <li>SSH keys only, password auth off, <code>ufw</code> default-deny, <code>unattended-upgrades</code> on</li>
       <li><code>git init</code> per R1. Start <code>runbook/000-log.md</code> per R5.</li>
     </ul>
