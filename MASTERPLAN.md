@@ -150,12 +150,24 @@ Before a single container.
 
 - **RAM → 16 GB.** Both slots hold 4 GB DDR4-3200, so this is a *replacement*, not an
   addition: buy 2 × 8 GB as a matched kit and keep dual channel (§01). ~₹2,000–3,000.
-- **USB-to-Ethernet adapter.** This chassis has no RJ45, and the built-in Realtek
-  RTL8822CE runs on Linux's `rtw88` driver, which has a long record of power-save
-  dropouts and flaky reconnects. Fine for a laptop; not something an always-on box
-  should depend on. Gigabit USB 3.0, ~₹500–900. *Check the box first — a Realtek USB
-  GbE driver is already installed in Windows, which suggests HP may have bundled one.*
-- **DHCP reservation** on your router so MAGI's IP never moves.
+- **USB-to-Ethernet adapter.** ✅ *Done — already owned.* This chassis has no RJ45, and
+  the built-in Realtek RTL8822CE runs on Linux's `rtw88` driver, which has a long record
+  of power-save dropouts and flaky reconnects. Fine for a laptop; not something an
+  always-on box should depend on. **What's in use:** a USB-C RTL8153 gigabit adapter on
+  the `r8152` driver — recovers from carrier loss in 4 s and survived eight connector
+  bounces on replug without wedging. It occupies MAGI's only USB-C port, which is the
+  real cost, and why `IITJ_WLAN` on `wlo1` stays worth doing eventually.
+- **The campus wall port is open.** ✅ *Verified with `scripts/magi/diag-net.sh`.* No
+  802.1X, no captive portal, no proxy; UDP passes (so Tailscale gets a direct path) and
+  ~64 Mbps measured. The username-and-password on campus applies to the wifi, not this.
+  Campus does block public DNS resolvers — `1.1.1.1` times out — so use the
+  DHCP-supplied resolver and never hardcode one in a container.
+- **~~DHCP reservation~~ — dropped, and it's worth knowing why.** The item assumed a
+  router you administer. Campus DHCP isn't yours to configure, and reserving is
+  unnecessary anyway: Tailscale gives MAGI a fixed `100.x` address and a MagicDNS name
+  that survive every network it ever joins, which is strictly better than a reservation
+  that only holds on one LAN. **Address MAGI by its tailnet name. Never write a campus
+  IP into a compose file or a Caddy config.**
 - **Lid-close behaviour**: `HandleLidSwitch=ignore` in `/etc/systemd/logind.conf`.
   Laptop closed, screen off, machine awake.
 - **The laptop battery is your UPS.** This is the one place the brainstorm was

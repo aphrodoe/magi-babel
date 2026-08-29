@@ -541,14 +541,16 @@ dl.glosslist{margin:20px 0}
     <div class="phase-h"><span class="id">H-00</span><span class="ti">Groundwork</span><span class="cost">₹0–3,500</span></div>
     <p>Before a single container.</p>
     <ul>
-      <li><code>dmidecode</code> RAM check → 16 GB if the slot exists</li>
-      <li><strong>DHCP reservation</strong> on the router so the IP never moves</li>
+      <li><strong>RAM → 16 GB.</strong> Surveyed: 2 × 4 GB DDR4-3200, <em>both slots full</em>, 32 GB ceiling. A replacement, not an addition — buy a matched pair and keep dual channel.</li>
+      <li><strong>USB-C ethernet adapter</strong> (RTL8153). No RJ45 on this chassis, and <code>rtw88</code> wifi is too flaky for an always-on box.</li>
+      <li><strong>Campus wall port is open</strong> — no 802.1X, no captive portal, no proxy, UDP passes. Verified, not assumed.</li>
+      <li><strong><s>DHCP reservation</s> — dropped.</strong> It assumed a router you administer. Tailscale's <code>100.x</code> address and MagicDNS name survive every network, which beats a reservation that holds on one LAN. Never write a campus IP into a compose file.</li>
       <li><strong>Lid-close behaviour</strong>: <code>HandleLidSwitch=ignore</code> in <code>/etc/systemd/logind.conf</code>. Lid shut, screen off, machine awake.</li>
       <li><strong>The laptop battery is your UPS.</strong> A laptop homelab has built-in power protection a desktop doesn't. Don't buy a UPS.</li>
       <li>SSH keys only, password auth off, <code>ufw</code> default-deny, <code>unattended-upgrades</code> on</li>
       <li><code>git init</code> per R1. Start <code>runbook/000-log.md</code> per R5.</li>
     </ul>
-    <div class="buy"><span class="k">Needs</span><span class="v">16 GB DDR4 SO-DIMM</span><span class="p">₹2,500–3,500 · if slot exists</span></div>
+    <div class="buy"><span class="k">Needs</span><span class="v">2 × 8 GB DDR4-3200, matched pair</span><span class="p">₹2,000–3,000 · both slots full</span></div>
     <div class="learn"><span class="plabel">Learn — Linux &amp; systems</span>
       <ul>
         <li><strong>MIT Missing Semester</strong> — free, the highest value-per-hour resource in this document</li>
