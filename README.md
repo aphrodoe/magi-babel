@@ -20,8 +20,8 @@ Rendered version with a plain-English toggle: [`magi-babel.html`](magi-babel.htm
 
 ## Progress
 
-**Phase H-00 · groundwork**, nearly complete. MAGI runs Ubuntu Server 26.04.1 and is
-reachable over Tailscale. Nothing containerised yet.
+**Phase H-00 · groundwork**, nearly complete. MAGI runs Ubuntu Server 26.04.1, survives
+an unattended reboot, and is reachable over Tailscale. Nothing containerised yet.
 
 ### MAGI — the homelab
 
