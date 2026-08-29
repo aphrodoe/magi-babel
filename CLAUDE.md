@@ -67,3 +67,5 @@ Every session gets **three lines**:
 
 Three honest lines, not a transcript. This file is also what the local model reads in
 H-08, so it compounds — signal is worth more here than volume.
+
+Run **`/wrap`** at the end of a session and it drafts the entry, commits and pushes.
