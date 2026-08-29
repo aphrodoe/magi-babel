@@ -16,6 +16,9 @@ Six Grafana panels you actually read passes. Forty does not.
 learning path paired to each one, hardware verdicts, and costs in ₹.
 Rendered version with a plain-English toggle: [`magi-babel.html`](magi-babel.html).
 
+🛒 **[`PURCHASES.md`](PURCHASES.md)** — what to buy next, what's deferred and why.
+Prices re-checked 30 Aug 2026 against the DRAM/NAND shortage.
+
 ---
 
 ## Progress

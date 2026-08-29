@@ -79,8 +79,10 @@ lab and roll it back in nine seconds.
 
 ### R3 — Backups are a plan, not a folder.
 **3-2-1**: three copies, two kinds of storage, one offsite. `restic` nightly to
-the external SSD, plus a cheap object-storage bucket or a drive you leave at home
-over break.
+an **external HDD** — not an SSD (§09) — plus a cheap object-storage bucket or a
+drive you leave at home over break. The nightly job is sequential, unattended and
+overnight; SSD latency buys nothing there, and under the 2026 NAND shortage it
+costs three times as much per TB.
 
 **Then test the restore.** Put a recurring event on your actual calendar:
 *"restore a random file from a 30-day-old snapshot."* An untested backup is a rumour.
@@ -205,9 +207,20 @@ from a dorm network).
 minutes and then its entire configuration lives in a SQLite blob that isn't in your
 git repo. Caddy is a fifteen-line Caddyfile that is, and it does automatic HTTPS.
 
-Then the first genuine wow moment: **buy a real domain** (~₹1,000/yr) and use
-**DNS-01 ACME** to get a wildcard cert for `*.lab.yourdomain.tld` — pointed at
-private IPs. Result:
+Then the first genuine wow moment: a real domain and **DNS-01 ACME** for a wildcard
+cert on `*.lab.yourdomain.tld` — pointed at private IPs.
+
+> **Domain: `akhildhyani.me`, already owned** via the GitHub Student Developer Pack.
+> ₹0, so this phase costs nothing.
+>
+> **But move DNS to Cloudflare before starting.** The Student Pack `.me` is registered
+> through Namecheap, and Namecheap only enables its API for accounts with 20+ domains,
+> a $50 balance, or $50 spent in two years — none of which a free student domain has.
+> No API means Caddy cannot answer a DNS-01 challenge there. Keep Namecheap as the
+> registrar, point the nameservers at Cloudflare (free), and use Caddy's Cloudflare
+> DNS module. Discover this now, not halfway through the phase.
+
+Result:
 
 ```
 https://jellyfin.lab.yourname.dev     valid cert, green padlock
@@ -250,9 +263,15 @@ Then the physical layer: something on the wall, always on.
 > ambient — and ambient has a much better option than a screen.
 
 **Start with what you already own.** The ESP32-S3 driving the LED strip in H-05 is
-*already* an MQTT subscriber. Add a ₹800 SPI colour display to that same board and
-you have a working status panel for the price of lunch — and you'll learn what you
-actually want to look at before spending real money.
+*already* an MQTT subscriber. Add a **2.4–2.8″ SPI TFT (ILI9341, 320×240), ₹600–1,200**
+to that same board — TFT_eSPI or LVGL — and you have a working status panel for the
+price of lunch. Its real job is to tell you *which six numbers you actually look at*,
+which you do not yet know, and which no amount of planning will settle.
+
+**The Arduino cannot do this, and the reason generalises.** A 7.5″ e-paper panel at
+800×480 mono needs a 47 KB framebuffer; an Uno has 2 KB of SRAM. Not slow — impossible.
+It also has no WiFi, so it cannot subscribe to MQTT at all. **Every display in this
+phase hangs off the ESP32-S3.** The Arduino has no role anywhere in H-01…H-05.
 
 Then upgrade deliberately. Full options in §06 D-7; the short version is that a
 **7.5″ e-paper panel** is the aesthetic and practical winner for ambient status,
@@ -311,9 +330,25 @@ audio-reactive path; a small custom firmware for the MQTT state machine.
 The white chase is my favourite thing in this document: **your room physically warns
 you that a satellite is about to fly over.**
 
+**Do the power arithmetic before buying the supply:**
+
+```
+300 LEDs (5 m @ 60/m) × 60 mA full white, full brightness = 18 A = 90 W
+5 V 10 A supply                                           = 50 W ≈ 55% of worst case
+```
+
+Buy the **10 A** anyway — every state in the table above lights a fraction of the strip
+— but **cap brightness in firmware** (`FastLED.setBrightness(128)`) so a stray all-white
+command never asks for 18 A from a 10 A supply.
+
 Wiring notes: inject 5 V at both ends on runs over 2 m, a 330–470 Ω resistor on the
 data line, a 1000 µF cap across the supply, and **common ground between the ESP32
 and the PSU** or you'll spend an evening debugging ghost flickers.
+
+**And one part missing from every version of this plan: a `74AHCT125` level shifter
+(~₹50).** The ESP32-S3 drives 3.3 V logic; WS2812B wants 5 V. It frequently *appears*
+to work without one and then fails intermittently on longer runs — which is the ghost
+flicker above, arriving months later when you have stopped suspecting the wiring.
 
 ### H-06 — THE SKY LOG · ₹4,800–5,500
 
@@ -1247,6 +1282,30 @@ costs roughly twice what I said at the retailers that actually have stock.
 | Pi 5 8 GB (retail) | ₹8,000 | **₹16,625** | Silverline — *out of stock* |
 | Pi 5 8 GB (retail) | ₹8,000 | **₹20,349** | Hubtronics — 4 in stock, incl. GST |
 
+### The 2026 memory and NAND shortage — re-checked 30 Aug 2026
+
+**Two of the numbers above are now badly wrong, and not because the retailers changed
+their minds.** DRAM and NAND are both in a supply crisis: the foundries moved wafer
+capacity to DDR5 and HBM for AI servers, so DDR4 is a legacy part made in shrinking
+volume, and NAND is being absorbed by datacenter builds.
+
+| Item | This plan said | Actual, Aug 2026 | Move |
+|---|--:|--:|---|
+| 2 × 8 GB DDR4 SODIMM | 2,000–3,000 | **12,000+** | Defer to H-08 |
+| 1 TB external SSD | 4,500–6,500 | **10,000–18,000** | **Buy a 2 TB HDD instead** |
+
+DDR4 kits are up 277–380% since Q1 2025; NVMe is up ~115%. Forecasts run past 2028, so
+**this is not a dip to wait out** — it is the price of these parts now.
+
+**The consequence is a design change, not just a bigger number.** R3's backup target was
+specified as an external SSD back when SSDs were cheap. Under this shortage a **2 TB
+external HDD at ~₹7,000** beats a 1 TB SSD at ₹10–18k for the job `restic` actually
+does: sequential, unattended, overnight. Latency is irrelevant there. Buy the HDD, get
+twice the capacity, spend a third of the money. Spinning rust is not in the shortage.
+
+The RAM has no such escape — H-08 needs the bandwidth and there is no cheaper substitute
+— which is exactly why H-00 closed without it. Nothing before H-08 cares.
+
 ### The Pi 5 problem
 Three retailers, three wildly different numbers, against a global list price of $80.
 The ₹16–20k listings are scarcity markup — but scarcity markup is what you actually
@@ -1279,8 +1338,11 @@ above is still an estimate. Worksheet instead of dressed-up guesses:
 | `Raspberry Pi 5 8GB` | Silverline, Robocraze, Robu, Element14 IN | <12,000 | ____ |
 | `Raspberry Pi 5 Active Cooler` | any Pi reseller | 600–900 | ____ |
 | `Raspberry Pi M.2 HAT+` | Silverline, Robu | 1,200–2,000 | ____ |
-| `1TB NVMe 2280 Gen3` | Amazon.in, MDComputers | 4,500–6,000 | ____ |
-| `8GB DDR4 SODIMM 3200` **×2, matched pair** | Amazon.in, MDComputers — DDR4 **confirmed** | 1,000–1,500 ea | ____ |
+| `2TB portable external HDD` | Amazon.in, Flipkart — **HDD, not SSD** | 5,500–7,000 | ____ |
+| `1TB NVMe 2280 Gen3` | Amazon.in, MDComputers — *NAND shortage, ~115% up* | 10,000+ | ____ |
+| `8GB DDR4 SODIMM 3200` **×2, matched pair** | Amazon.in, MDComputers — **shortage, defer to H-08** | 12,000+ pair | ____ |
+| `2.4-2.8" SPI TFT ILI9341 320x240` | Robu, Sunrom, Amazon.in | 600–1,200 | ____ |
+| `74AHCT125 level shifter` | Sunrom, Evelta | ~50 | ____ |
 | `USB 3.0 Gigabit Ethernet adapter` | Amazon.in — check the laptop box first | 500–900 | ____ |
 | `Waveshare 7inch HDMI LCD (H)` | Robu, Robozar | 4,000–5,500 | ____ |
 | `Heltec WiFi LoRa 32 V3 868MHz` ×2 | Robu, AliExpress — **865/868 only** | 2,500–4,000 ea | ____ |
@@ -1303,17 +1365,22 @@ RAM, SSDs, power banks; almost always cheapest) · AliExpress (Heltec, LilyGO, G
 Iron **owned** · ~₹750 chisel tip + 63/37 solder + flux + brass cleaner ·
 ~₹1,200 multimeter if absent · ~₹800 cutters, strippers, helping hands
 
-**Tier 1 — Magi through H-06: ₹15,600–21,800**
+**Tier 1 — Magi through H-06: ₹14,900–21,700**, plus deferred RAM
 
 | Item | ₹ |
 |---|---|
-| ~ 16 GB SO-DIMM | 2,500–3,500 |
-| ~ 1 TB external SSD | 4,500–6,500 |
-| ~ Gigabit switch + Cat6 | 1,500–2,300 |
-| ~ WS2812B 5 m + 5 V 10 A PSU + wiring | 1,500–2,500 |
+| ✓ 2 × 8 GB DDR4 SODIMM — **deferred to H-08** | 12,000+ |
+| ✓ 2 TB external **HDD** — replaces the 1 TB SSD | 5,500–7,000 |
+| ~ 2.4–2.8″ SPI TFT for the panel prototype | 600–1,200 |
+| ~ WS2812B 5 m + 5 V 10 A PSU + level shifter + wiring | 2,000–3,400 |
+| ~ Bench kit — tips, solder, flux, cutters, meter, passives | 2,500–4,500 |
 | ✓ RTL-SDR Blog **V3** + dipole | 4,800–5,500 |
-| ~ Domain, per year | 800–1,500 |
+| ✓ Domain — `akhildhyani.me`, GitHub Student Pack | **0** |
+| ~ Gigabit switch + Cat6 — *not needed before H-10* | 1,500–2,300 |
+| ~ 7.5″ e-paper — *defer until the prototype says what goes on it* | 7,000–9,000 |
 | Laptop, monitor, ESP32-S3, Arduino, old phone | **owned** |
+
+The Arduino is listed as owned but has no role before H-06 — see H-03 for why.
 
 **Tier 2 — Babel-2588 core: ₹26,300–62,000**
 

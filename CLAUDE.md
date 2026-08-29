@@ -44,6 +44,13 @@ rather than assuming; don't restate it back into this file.**
 - **Carried over from H-00: the RAM.** 2 × 8 GB DDR4-3200, a matched pair replacing both
   4 GB sticks (§01). Nothing before H-08 needs it, which is why H-00 was closed without
   it — but it is the one physical purchase still outstanding.
+- **DRAM and NAND are in a global shortage (checked 30 Aug 2026).** DDR4 kits are up
+  277–380% since Q1 2025 and NVMe ~115%; forecasts run past 2028. **Never quote this
+  repo's older price estimates as current** — `PURCHASES.md` holds the re-checked ones.
+  The knock-on design decision: R3's backup target is an **external HDD, not an SSD**.
+- **The domain is `akhildhyani.me`** (GitHub Student Pack, ₹0). Its DNS must be moved to
+  Cloudflare before H-01 — Namecheap won't give an API key to a free student account, and
+  DNS-01 needs one.
 
 <!-- Keep this block current. It is the one thing a fresh session can't infer. -->
 
