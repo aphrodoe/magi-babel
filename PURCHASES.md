@@ -27,6 +27,26 @@ R6: **buy what unblocks the next phase, nothing else.** The exception is AliExpr
 
 **≈ ₹10,600–16,100 total.**
 
+**Checked against live listings, 30 Aug 2026:**
+
+- **Buy the strip on Amazon (₹1,252), not Robu (₹2,759).** Robu's is IP67 waterproof —
+  worse indoors, not better: the silicone sleeve traps heat and makes cutting and
+  soldering to the pads awkward, for sealing a bedroom wall will never need.
+- **Pay up for the Mean Well LRS-50-5 (₹1,499) over the ₹799–899 generics.** It runs
+  24/7, fanless, under continuous load from 300 LEDs. No-name 50 W bricks are where
+  this kind of build actually fails.
+- **Robu's own listing says 50 mA/LED**, so worst case is 300 × 50 mA = **15 A = 75 W**
+  against a 50 W supply. Fine for every state in H-05's table — still cap brightness.
+- **The display ships as either ILI9341 or ST7789, seller's choice.** Set the matching
+  driver in TFT_eSPI `User_Setup.h`; a white screen on correct wiring is almost always
+  this. It is 3.3 V IO, so no level shifting — unlike the strip.
+- **Every 74AHCT125 Robu stocks is surface-mount** (SO-14, TSSOP-14, DHVQFN-14). H-05 is
+  the first time you hold an iron; do not learn on 0.65 mm pitch. Search `74AHCT125N`
+  for the DIP-14 part, or take the diode route below. Ignore the ₹2,924 Amazon listing
+  for a ₹60 chip.
+- **Set your Amazon delivery address to Jodhpur before ordering.** It currently defaults
+  to Noida.
+
 **Three things that are easy to get wrong:**
 
 1. **HDD, not SSD.** The plan originally said "1 TB external SSD". Under the NAND
