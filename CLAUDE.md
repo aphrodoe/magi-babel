@@ -17,9 +17,19 @@ rather than assuming; don't restate it back into this file.**
 - **Reach it with `ssh magi`** — Tailscale (H-01, pulled forward) bridges cipher and
   magi across different networks. On cipher, Tailscale and Cloudflare WARP coexist only
   because `*.tailscale.com` is in WARP's split-tunnel exclude list; don't reset that.
-- Outstanding H-00: RAM pair and USB-Ethernet not bought, no DHCP reservation,
-  `apt upgrade` pending non-mobile data, MAGI's permanent network undecided (campus
-  wifi is WPA2-Enterprise; wired is captive-portal or 802.1X, not yet determined).
+- **Network is settled.** MAGI sits on campus wired via a USB-C Ethernet adapter. The
+  wall port is **open** — no 802.1X, no captive portal, no proxy, and UDP passes (probed
+  with `scripts/net-probe.sh`). Config is `config/netplan/10-magi-net.yaml`, matching
+  `en*` so the adapter and a phone tether are interchangeable; install it with
+  `scripts/apply-netplan.sh`, never by editing `/etc/netplan` directly.
+- **MAGI's address is `100.94.219.53`, not its DHCP lease.** Campus DHCP is out of our
+  control and the lease will move; the Tailscale IP and the MagicDNS name won't. Anything
+  that needs to name MAGI names it that way. This is why no DHCP reservation is needed.
+- Campus blocks public DNS resolvers (`1.1.1.1` times out). Use the DHCP-supplied
+  resolver; don't hardcode 1.1.1.1 in any container.
+- **MAGI has no repo of its own to edit** — `~/homelab` is a read-only-deploy-key clone
+  of this repo. `git pull` there; pushes come from cipher.
+- Outstanding H-00: RAM pair not bought, `apt upgrade` not yet run.
 
 <!-- Keep this block current. It is the one thing a fresh session can't infer. -->
 

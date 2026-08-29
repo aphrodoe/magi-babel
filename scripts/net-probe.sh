@@ -56,7 +56,7 @@ for _ in $(seq 40); do
   sleep 1
 done
 wait $TCPD 2>/dev/null
-EAPCOUNT=$(grep -c . "$EAP" 2>/dev/null || echo 0)
+EAPCOUNT=$(grep -c . "$EAP" 2>/dev/null); EAPCOUNT=${EAPCOUNT:-0}
 
 echo
 echo "=== results ==="
