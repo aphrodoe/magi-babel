@@ -64,5 +64,20 @@ echo "· sleep/suspend/hibernate: masked"
 systemctl restart systemd-logind
 echo "· logind restarted — lid setting is live"
 
+# The battery is MAGI's UPS, so the critical-battery action matters. Stock is
+# HybridSleep — which we just masked, so upower would try it, fail, and let the
+# box hard-die at 0%. Hibernate isn't an alternative either: swap (4G) is smaller
+# than RAM (8G), and will stay smaller when the RAM is upgraded to 16G.
+# PowerOff is "risky" in upower's terms (it drops unsaved state), which is why it
+# needs the second key — but a clean shutdown beats an unclean one every time.
+mkdir -p /etc/UPower/UPower.conf.d
+cat > /etc/UPower/UPower.conf.d/10-magi-power.conf <<'EOF'
+[UPower]
+CriticalPowerAction=PowerOff
+AllowRiskyCriticalPowerAction=true
+EOF
+systemctl restart upower
+echo "· upower: clean PowerOff at critical battery (was HybridSleep, which is masked)"
+
 echo
 echo "done. verify from cipher:  ssh magi 'sudo ufw status verbose'"
