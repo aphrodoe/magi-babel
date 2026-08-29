@@ -52,7 +52,17 @@ HandleLidSwitch=ignore
 HandleLidSwitchExternalPower=ignore
 HandleLidSwitchDocked=ignore
 EOF
-echo "· logind: lid switch ignored (takes effect after reboot)"
+echo "· logind: lid switch ignored"
+
+# A server must never suspend. Masking makes it impossible rather than merely
+# unconfigured — 'static' targets can still be pulled in by something else.
+systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target >/dev/null 2>&1 || true
+echo "· sleep/suspend/hibernate: masked"
+
+# logind only reads its config at start, so apply it now rather than waiting for
+# a reboot to make the lid safe.
+systemctl restart systemd-logind
+echo "· logind restarted — lid setting is live"
 
 echo
 echo "done. verify from cipher:  ssh magi 'sudo ufw status verbose'"
