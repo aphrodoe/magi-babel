@@ -25,11 +25,21 @@ rather than assuming; don't restate it back into this file.**
 - **MAGI's address is `100.94.219.53`, not its DHCP lease.** Campus DHCP is out of our
   control and the lease will move; the Tailscale IP and the MagicDNS name won't. Anything
   that needs to name MAGI names it that way. This is why no DHCP reservation is needed.
-- Campus blocks public DNS resolvers (`1.1.1.1` times out). Use the DHCP-supplied
-  resolver; don't hardcode 1.1.1.1 in any container.
+- **Never hardcode `1.1.1.1`.** On campus wifi that address *is* the DHCP server — it
+  answers as local infrastructure, not Cloudflare — and on wired it simply times out.
+  Use the DHCP-supplied resolver everywhere, containers included.
+- **Wifi is a dormant fallback, not a second active path.** `wlo1` is on `IITJ_WLAN`
+  (WPA2-Enterprise, PEAP/MSCHAPv2), configured by `scripts/magi/30-wifi.sh`. Wired wins
+  on route metric; wifi carries traffic only when the cable is out. **Its credentials
+  live only in root-only `/etc/netplan/30-magi-wifi.yaml` on MAGI** — deliberately not in
+  the repo, so a rebuild re-prompts for them. That is the one config R2 cannot regenerate.
+- **SSH is tailnet-only.** Port 22 is closed on the physical NICs; `20-harden.sh` drops
+  the OpenSSH rule once `tailscale0` has an address, and re-adds it if it doesn't. If the
+  tailnet is ever down, use MAGI's own keyboard — it is a laptop.
 - **MAGI has no repo of its own to edit** — `~/homelab` is a read-only-deploy-key clone
   of this repo. `git pull` there; pushes come from cipher.
-- Outstanding H-00: RAM pair not bought, `apt upgrade` not yet run.
+- Outstanding H-00: RAM pair not bought (blocks H-08 only); BIOS not yet checked for an
+  AC-restore option, which is the last power-cut gap.
 
 <!-- Keep this block current. It is the one thing a fresh session can't infer. -->
 
