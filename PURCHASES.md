@@ -19,13 +19,13 @@ R6: **buy what unblocks the next phase, nothing else.** The exception is AliExpr
 |:-:|---|---|--:|--:|
 | ✅ | Domain `akhildhyani.me` | GitHub Student Developer Pack | **0** | 0 |
 | ⬜ | **2 TB portable external HDD** | Amazon.in, Flipkart | 5,500–7,000 | ____ |
-| ⬜ | 2.4–2.8″ SPI TFT, ILI9341 320×240 | Robu, Sunrom, Amazon.in | 600–1,200 | ____ |
-| ⬜ | WS2812B 5 m 60 LED/m strip | Robu, Amazon.in | 1,200–2,000 | ____ |
-| ⬜ | 5 V 10 A SMPS | Robu, Amazon.in | 700–1,200 | ____ |
-| ⬜ | 74AHCT125 level shifter | Sunrom, Evelta | ~50 | ____ |
+| ⬜ | 2.4″ SPI TFT 240×320 — Robu SKU 766311 | **Robu** | **649** | ____ |
+| ⬜ | WS2812B 5 m 60/m — **non-waterproof** | **Amazon.in** | **~1,252** | ____ |
+| ⬜ | 5 V 10 A SMPS — **Mean Well LRS-50-5** | **Amazon.in** | **~1,499** | ____ |
+| ⬜ | ~~74AHCT125~~ → one `1N4001`, see below | Robu, in the passives | ~5 | ____ |
 | ⬜ | Bench kit — see below | Robu, Sunrom, Amazon.in | 2,500–4,500 | ____ |
 
-**≈ ₹10,600–16,100 total.**
+**≈ ₹11,400–14,900 total.** Three rows are now live prices, not estimates.
 
 **Checked against live listings, 30 Aug 2026:**
 
@@ -56,9 +56,10 @@ R6: **buy what unblocks the next phase, nothing else.** The exception is AliExpr
    Namecheap, whose API needs 20 domains / $50 balance / $50 spent in 2 years. Without
    it Caddy cannot answer a DNS-01 challenge. Keep Namecheap as registrar, point the
    nameservers at Cloudflare (free), use Caddy's Cloudflare module.
-3. **The 10 A supply cannot do full white.** 300 LEDs × 60 mA = 18 A worst case against
-   50 W of supply. Fine for every state in H-05's table — just cap brightness in
-   firmware so a stray all-white command never asks for it.
+3. **The 10 A supply cannot do full white.** 300 LEDs at 50–60 mA each (Robu's listing
+   says 50, the datasheet maximum is 60) is **15–18 A worst case** against 10 A of
+   supply. Fine for every state in H-05's table, none of which lights the whole strip
+   white — just cap brightness in firmware so a stray all-white never asks for it.
 
 ---
 
@@ -140,7 +141,8 @@ useful for years, not to be bought in one order. Soldering iron already owned.
   zip ties, adhesive cable clips, M3 standoff/screw kit
 - **Prototyping** — **half + full breadboard**, **male and female pin header strips** · perfboard
 - **Passives & semis** — **resistor assortment E12 ¼ W**, **capacitor assortment incl.
-  1000 µF/16 V**, **74AHCT125** · IRLZ44N logic-level MOSFETs, 1N4148/1N4007, LEDs, BC547
+  1000 µF/16 V**, **1N4001 diodes** *(one is the level-shift fix)* · IRLZ44N logic-level
+  MOSFETs, 1N4148, LEDs, BC547 · `74AHCT125N` **DIP-14 only** if you want the proper buffer
 - **Power & safety** — **inline fuse holder + fuses on the 5 V rail**, **safety glasses** ·
   small fan for solder fumes · bench PSU, later
 - **Storage** — compartment organiser, label maker. Unglamorous, and the reason you can
@@ -159,18 +161,23 @@ missing ₹50 part blocks an evening. Consolidate.
 Drives, tools and household goods, where brand and return policy matter more than
 catalogue depth.
 
-`2 TB external HDD (Seagate Expansion / WD Elements)` · `vertical laptop stand` ·
+`2 TB external HDD (Seagate Expansion / WD Elements)` · **`WS2812B 5 m 60/m,
+non-waterproof`** · **`Mean Well LRS-50-5 5 V 10 A`** · `vertical laptop stand` ·
 `power strip` · `velcro cable ties` · `digital multimeter` · `heat-resistant silicone
 mat` · `safety glasses` · `component organiser box` · *`boltless rack`, only if no local
 fabricator*
+
+The strip and the supply moved here from Robu: Amazon's non-waterproof strip is ₹1,252
+against Robu's ₹2,759 IP67, and Mean Well is not something Robu stocks.
+
+**Set the delivery address to Jodhpur first — it currently defaults to Noida.**
 
 ### Order 2 — Robu.in · every electronic part in one basket
 
 The widest catalogue in India, and the reason this stays at two sites — it covers the
 modules, the consumables and the hand tools together.
 
-`WS2812B 5 m 60 LED/m` · `5 V 10 A SMPS` · `2.4–2.8" ILI9341 SPI TFT` ·
-`74AHCT125` *(see below)* · `chisel + conical tips` · `63/37 solder 0.8 mm` · `flux` ·
+`2.4" SPI TFT 240×320 (SKU 766311)` · `chisel + conical tips` · `63/37 solder 0.8 mm` · `flux` ·
 `brass tip cleaner` · `desoldering braid` · `flush cutters` · `wire strippers` ·
 `needle-nose pliers` · `tweezers` · `helping hands` · `22 AWG silicone wire` ·
 `JST-SM 3-pin pairs` · `Dupont jumpers` · `pin headers` · `heat-shrink assortment` ·
@@ -191,11 +198,14 @@ so the site count stays at two.
 
 ### The one part that might force a third site
 
-**`74AHCT125`** (or `74HCT245`). If Robu is out of stock, **Evelta** is the right
-source — Mumbai, direct partnerships with TI and ST, and counterfeit logic ICs are a
-genuine problem in this market.
+**`74AHCT125`** — and the catch is packaging, not stock. **Every variant Robu lists is
+surface-mount**: SO-14, TSSOP-14 (0.65 mm pitch), DHVQFN-14 (needs hot air). H-05 is the
+first time you hold an iron, and none of those is the part to learn on. Search
+`74AHCT125N` — the `N` suffix is DIP-14, through-hole — or use **Evelta** (Mumbai,
+direct TI/ST partnerships; counterfeit logic ICs are a real problem here). Ignore the
+₹2,924 Amazon listing for a chip Mouser India sells at ₹62.
 
-**Or avoid the third order entirely with a diode.** WS2812B reads logic-high at
+**Better: avoid the chip and the third order entirely with a diode.** WS2812B reads logic-high at
 0.7 × VDD, which is 3.5 V on a 5 V rail — just above the ESP32's 3.3 V, which is why it
 works until it doesn't. Feed **only the first LED** through a `1N4001` (already in the
 Robu basket): its VDD drops to ~4.3 V, its threshold to ~3.0 V, and 3.3 V data is
