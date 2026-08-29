@@ -551,7 +551,7 @@ dl.glosslist{margin:20px 0}
       <li>SSH keys only, password auth off, <code>ufw</code> default-deny, <code>unattended-upgrades</code> on</li>
       <li><code>git init</code> per R1. Start <code>runbook/000-log.md</code> per R5.</li>
     </ul>
-    <div class="buy"><span class="k">Needs</span><span class="v">2 × 8 GB DDR4-3200, matched pair</span><span class="p">₹2,000–3,000 · both slots full</span></div>
+    <div class="buy"><span class="k">Needs</span><span class="v">2 × 8 GB DDR4-3200, matched pair</span><span class="p">₹12,000+ · shortage · deferred to H-08</span></div>
     <div class="learn"><span class="plabel">Learn — Linux &amp; systems</span>
       <ul>
         <li><strong>MIT Missing Semester</strong> — free, the highest value-per-hour resource in this document</li>
@@ -577,7 +577,7 @@ dl.glosslist{margin:20px 0}
     <p>Then the first genuine wow moment: <strong>buy a real domain</strong> (~₹1,000/yr) and use <strong>DNS-01 ACME</strong> for a wildcard cert on <code>*.lab.yourdomain.tld</code>, pointed at private IPs.</p>
     <pre><code>https://jellyfin.lab.yourname.dev    valid cert, green padlock
 https://grafana.lab.yourname.dev     no port numbers, no warnings</code></pre>
-    <div class="buy"><span class="k">Needs</span><span class="v">A domain name</span><span class="p">₹800–1,500/yr · .dev, .xyz or .in</span></div>
+    <div class="buy"><span class="k">Needs</span><span class="v">akhildhyani.me — owned</span><span class="p">₹0 · Student Pack · move DNS to Cloudflare</span></div>
     <div class="plain"><span class="plabel">In plain English</span>
       <p>A <b>container</b> is an app plus everything it needs, sealed into one package you start and stop with one command. Break it, delete it, start a fresh one — nothing else is touched. That's why a homelab can be reckless and still be safe. <b>Docker Compose</b> is the text file listing which containers you want and how they're wired.</p>
       <p><b>Tailscale</b> makes all your devices behave as though plugged into the same home router, wherever they are. <b>Port-forwarding</b> is the old way and it puts your laptop on the open internet for anyone to find.</p>
@@ -631,7 +631,7 @@ magi/light/cmd                 the only write topic</code></pre>
 
     <p><strong>Start with what you already own.</strong> The ESP32-S3 driving the LED strip in H-05 is <em>already</em> an MQTT subscriber. Add a ₹800 SPI colour display to that same board and you have a working status panel for the price of lunch — and you'll learn what you actually want to look at before spending real money.</p>
     <p>Then upgrade deliberately. Full options and verdicts in <a href="#dossier">§06 D-7</a>; the short version is that a <strong>7.5″ e-paper panel</strong> is the aesthetic and practical winner for ambient status, and a <strong>used Android tablet</strong> is the right answer if you decide you want the whole Grafana dashboard and touch.</p>
-    <div class="buy"><span class="k">Needs</span><span class="v">₹800 SPI display now · ₹3,000–9,000 later</span><span class="p">ESP32-S3 owned · see D-7</span></div>
+    <div class="buy"><span class="k">Needs</span><span class="v">2.4–2.8″ SPI TFT now · 7.5″ e-paper later</span><span class="p">₹600–1,200 now · ₹7,000–9,000 later · ESP32-S3 only</span></div>
     <div class="plain"><span class="plabel">In plain English</span>
       <p><b>E-paper</b> (e-ink) is the screen technology in a Kindle. It holds an image with <em>no power at all</em> — electricity is only used to change what's shown. So a wall panel refreshing every minute draws almost nothing, and it's lit by the room rather than lighting the room.</p>
       <p>That last part matters more than it sounds in a dorm. A tablet glowing on your wall all night is genuinely annoying to sleep next to. E-paper just sits there like a printed sheet that happens to be correct.</p>
@@ -651,7 +651,7 @@ magi/light/cmd                 the only write topic</code></pre>
   </div>
 
   <div class="phase">
-    <div class="phase-h"><span class="id">H-04</span><span class="ti">The House</span><span class="cost">₹4,500–6,500</span></div>
+    <div class="phase-h"><span class="id">H-04</span><span class="ti">The House</span><span class="cost">₹5,500–7,000</span></div>
     <p>The services that make people say <em>"wait, you're not paying for that?"</em></p>
     <div class="tbl-w"><table>
       <thead><tr><th>Service</th><th>Replaces</th><th>Why it earns its slot</th></tr></thead>
@@ -666,7 +666,7 @@ magi/light/cmd                 the only write topic</code></pre>
         <tr><td><strong>Authelia</strong></td><td>—</td><td><strong>SSO across all of it.</strong> One login. The pro move.</td></tr>
       </tbody>
     </table></div>
-    <div class="buy"><span class="k">Needs</span><span class="v">1 TB external SSD</span><span class="p">₹4,500–6,500 · media, photos, backups</span></div>
+    <div class="buy"><span class="k">Needs</span><span class="v">2 TB external HDD — <em>not</em> an SSD</span><span class="p">₹5,500–7,000 · restic writes sequentially; SSD latency buys nothing, and NAND is in shortage</span></div>
     <div class="learn"><span class="plabel">Learn — storage, auth, data</span>
       <p>This is where you meet <em>bind mounts vs volumes</em>, <em>UID/GID mapping</em> (the reason half of everyone's permission errors happen), <em>Postgres backups</em>, and <em>forward-auth SSO</em>. Read the Authelia architecture page — the diagram of how a request gets intercepted, redirected, authenticated and forwarded is worth an hour on its own.</p>
       <div class="proof"><b>Proof</b>Restore Vaultwarden from a backup into a fresh container and log in. If that works, R3 is real rather than aspirational.</div>
@@ -692,7 +692,7 @@ magi/light/cmd                 the only write topic</code></pre>
       </tbody>
     </table></div>
     <p>The white chase is my favourite thing in this document: <strong>your room physically warns you that a satellite is about to fly over.</strong></p>
-    <div class="buy"><span class="k">Needs</span><span class="v">WS2812B 5 m 60/m · 5 V 10 A SMPS · ESP32-S3</span><span class="p">₹1,500–2,500 · board owned</span></div>
+    <div class="buy"><span class="k">Needs</span><span class="v">WS2812B 5 m 60/m · 5 V 10 A SMPS · 74AHCT125 level shifter</span><span class="p">₹2,000–3,400 · cap brightness: 300 LEDs full white = 18 A</span></div>
     <div class="card">
       <span class="lbl">Wiring notes — the four things that go wrong</span>
       <p>Inject 5 V at both ends on runs over 2 m. 330–470 Ω on the data line. 1000 µF across the supply. <strong>Common ground between the ESP32 and the PSU</strong> — skip that and you'll spend an evening chasing ghost flickers.</p>
@@ -1587,11 +1587,12 @@ magi/light/cmd                 the only write topic</code></pre>
       <tr><td><code>Raspberry Pi 5 Active Cooler</code></td><td>any Pi reseller</td><td class="num">600–900</td><td class="num">____</td></tr>
       <tr><td><code>Raspberry Pi M.2 HAT+</code></td><td>Silverline, Robu</td><td class="num">1,200–2,000</td><td class="num">____</td></tr>
       <tr><td><code>1TB NVMe 2280 Gen3</code></td><td>Amazon.in, MDComputers</td><td class="num">4,500–6,000</td><td class="num">____</td></tr>
-      <tr><td><code>16GB DDR4 SODIMM 3200</code></td><td>Amazon.in — <em>confirm DDR4 vs DDR5 first</em></td><td class="num">2,500–3,500</td><td class="num">____</td></tr>
+      <tr><td><code>8GB DDR4 SODIMM 3200</code> ×2, matched pair</td><td>Amazon.in — <em>DDR4 confirmed; global shortage, defer to H-08</em></td><td class="num">12,000+</td><td class="num">____</td></tr>
+      <tr><td><code>2TB portable external HDD</code></td><td>Amazon.in, Flipkart — <em>HDD, not SSD</em></td><td class="num">5,500–7,000</td><td class="num">____</td></tr>
       <tr><td><code>Waveshare 7inch HDMI LCD (H)</code></td><td>Robu, Robozar</td><td class="num">4,000–5,500</td><td class="num">____</td></tr>
       <tr><td><code>Heltec LoRa 32 V3 868MHz</code> ×2</td><td>Robu, AliExpress — <strong>865/868 only</strong></td><td class="num">2,500–4,000 ea</td><td class="num">____</td></tr>
       <tr><td><code>137MHz LNA SAW filter</code></td><td>Robu, AliExpress</td><td class="num">1,500–2,500</td><td class="num">____</td></tr>
-      <tr><td><code>WS2812B 5m 60LED/m</code> + <code>5V 10A SMPS</code></td><td>Robu, Amazon.in</td><td class="num">1,500–2,500</td><td class="num">____</td></tr>
+      <tr><td><code>WS2812B 5m 60LED/m</code> + <code>5V 10A SMPS</code> + <code>74AHCT125</code></td><td>Robu, Amazon.in, Sunrom</td><td class="num">2,000–3,400</td><td class="num">____</td></tr>
       <tr><td><code>20000mAh 45W PD power bank</code></td><td>Amazon.in</td><td class="num">2,500–4,000</td><td class="num">____</td></tr>
       <tr><td><code>analog panel meter 100uA</code></td><td>Robu, Sunrom</td><td class="num">300–600</td><td class="num">____</td></tr>
       <tr><td><code>N100 mini PC 16GB</code> ×2</td><td>Amazon.in</td><td class="num">11,000–15,000 ea</td><td class="num">____</td></tr>
