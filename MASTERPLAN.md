@@ -113,9 +113,27 @@ modules, LNAs) take 3–6 weeks. Order those one phase early.
 sudo dmidecode -t memory | grep -E "Size|Speed|Locator|Form Factor"
 ```
 
-Free SO-DIMM slot → buy 16 GB and the plan works as written. Soldered with no slot
-→ the laptop becomes a services box only, the AI node moves to a used mini-PC
-later, and you should know that *now* rather than in month eleven.
+On Windows, before the wipe, the same question:
+
+```powershell
+Get-WmiObject Win32_PhysicalMemory | Format-Table BankLabel, DeviceLocator, Capacity, Speed
+```
+
+**What MAGI's laptop turned out to be** — checked 2026-08-29, HP 15s-fq5xxx:
+**2 × 4 GB DDR4-3200, both slots occupied, socketed, 32 GB ceiling.** That is a third
+case this section originally didn't have:
+
+| What you find | What it means |
+|---|---|
+| A free slot | Add one stick. Cheapest path. |
+| **Both slots full, socketed** | **Replace the pair.** Costs more; ceiling is higher. ← MAGI |
+| Soldered, no free slot | Services box only; the Oracle moves to a mini-PC at H-10. |
+
+**Buy a matched pair, never one big stick.** Two channels of DDR4-3200 is ~51 GB/s
+against ~26 GB/s on one — and H-08 is where that stops being trivia. Local LLM speed
+is set by *memory bandwidth*, not cores (the same reason unified-memory Macs punch
+above their weight, §04). A single 16 GB stick would roughly halve the Oracle's token
+rate and slow the iGPU's Jellyfin transcode with it.
 
 8 GB running Ollama, Jellyfin transcoding, Prometheus, Suricata and an SDR at once
 will live in swap and make you conclude self-hosting is miserable. It isn't. The
@@ -130,17 +148,24 @@ Numbering is build order. Don't skip; each phase depends on the last.
 ### H-00 — GROUNDWORK · ₹0–4,000
 Before a single container.
 
-- `dmidecode` RAM check → upgrade to 16 GB if the slot exists.
+- **RAM → 16 GB.** Both slots hold 4 GB DDR4-3200, so this is a *replacement*, not an
+  addition: buy 2 × 8 GB as a matched kit and keep dual channel (§01). ~₹2,000–3,000.
+- **USB-to-Ethernet adapter.** This chassis has no RJ45, and the built-in Realtek
+  RTL8822CE runs on Linux's `rtw88` driver, which has a long record of power-save
+  dropouts and flaky reconnects. Fine for a laptop; not something an always-on box
+  should depend on. Gigabit USB 3.0, ~₹500–900. *Check the box first — a Realtek USB
+  GbE driver is already installed in Windows, which suggests HP may have bundled one.*
 - **DHCP reservation** on your router so MAGI's IP never moves.
 - **Lid-close behaviour**: `HandleLidSwitch=ignore` in `/etc/systemd/logind.conf`.
   Laptop closed, screen off, machine awake.
 - **The laptop battery is your UPS.** This is the one place the brainstorm was
   right for the right reason — a laptop homelab has built-in power protection that
   a desktop doesn't. Don't buy a UPS.
+  **Verified on this machine:** 41,050 mWh design, 41,050 mWh full charge, 2 cycles —
+  100% health, roughly 3–4 hours of ride-through at idle. Best case, confirmed.
 - SSH keys only, password auth off, `ufw` default-deny, `unattended-upgrades` on.
-- `git init` the repo per R1. Start `runbook/000-log.md` per R5.
-- Start `runbook/000-log.md`. Every session gets three lines: what you did, what
-  broke, what you'd do differently.
+- `git init` the repo per R1, and start `runbook/000-log.md` per R5 — three lines a
+  session: what you did, what broke, what you'd do differently.
 
 **LEARN — Linux & systems**
 - **MIT Missing Semester** — free, the highest value-per-hour resource in this document
@@ -1235,7 +1260,8 @@ above is still an estimate. Worksheet instead of dressed-up guesses:
 | `Raspberry Pi 5 Active Cooler` | any Pi reseller | 600–900 | ____ |
 | `Raspberry Pi M.2 HAT+` | Silverline, Robu | 1,200–2,000 | ____ |
 | `1TB NVMe 2280 Gen3` | Amazon.in, MDComputers | 4,500–6,000 | ____ |
-| `16GB DDR4 SODIMM 3200` | Amazon.in — *confirm DDR4 vs DDR5 first* | 2,500–3,500 | ____ |
+| `8GB DDR4 SODIMM 3200` **×2, matched pair** | Amazon.in, MDComputers — DDR4 **confirmed** | 1,000–1,500 ea | ____ |
+| `USB 3.0 Gigabit Ethernet adapter` | Amazon.in — check the laptop box first | 500–900 | ____ |
 | `Waveshare 7inch HDMI LCD (H)` | Robu, Robozar | 4,000–5,500 | ____ |
 | `Heltec WiFi LoRa 32 V3 868MHz` ×2 | Robu, AliExpress — **865/868 only** | 2,500–4,000 ea | ____ |
 | `WS2812B 5m 60LED/m` + `5V 10A SMPS` | Robu, Amazon.in | 1,500–2,500 | ____ |

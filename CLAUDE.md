@@ -9,11 +9,14 @@ rather than assuming; don't restate it back into this file.**
 
 ## Where I am right now
 
-- **Phase: H-00 (groundwork).** Nothing deployed yet.
-- Next concrete step: `sudo dmidecode -t memory` to find out whether the laptop has a
-  free SO-DIMM slot. That answer changes the plan (see §01, "The very first command").
+- **Phase: H-00 (groundwork).** Nothing deployed yet. Laptop still on Windows 11.
+- Hardware surveyed 2026-08-29: HP 15s-fq5xxx, i5-1235U (10c/12t, Iris Xe), 2 × 4 GB
+  DDR4-3200 **both slots full** (32 GB ceiling), 512 GB NVMe, **no Ethernet port**,
+  battery at 100% health. See §01 "The very first command".
+- Next concrete step: buy 2 × 8 GB DDR4-3200 (matched pair — dual channel matters for
+  H-08) and a USB-Ethernet adapter, then wipe Windows for Ubuntu Server.
 
-<!-- Keep the two lines above current. It is the one thing a fresh session can't infer. -->
+<!-- Keep this block current. It is the one thing a fresh session can't infer. -->
 
 ## Rules that matter more than convenience
 
