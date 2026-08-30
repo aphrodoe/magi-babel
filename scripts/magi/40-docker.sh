@@ -46,7 +46,22 @@ EOF
 systemctl restart docker
 echo "· daemon.json: logs capped at 3 x 10M per container"
 
-# --- 4. run docker without sudo ------------------------------------------
+# --- 4. let a port bind before its address exists -------------------------
+# compose/caddy publishes on 100.94.219.53, MAGI's tailnet address, so the port
+# never opens on the campus LAN (rule 7). But that address only appears once
+# tailscaled has registered, and docker starts containers at boot without
+# waiting for it — so Caddy died on 2026-08-30 with
+#   failed to bind host port 100.94.219.53:80/tcp: cannot assign requested address
+# and, being a *start* failure rather than a crash, the restart policy never
+# retried it. ip_nonlocal_bind lets the socket bind ahead of the address; packets
+# still only ever arrive over tailscale0, so nothing is loosened.
+cat > /etc/sysctl.d/10-magi-nonlocal-bind.conf <<'EOF'
+net.ipv4.ip_nonlocal_bind = 1
+EOF
+sysctl -q --system
+echo "· sysctl: ip_nonlocal_bind=1 — published ports survive tailscale0 being late"
+
+# --- 5. run docker without sudo ------------------------------------------
 # The docker group is root-equivalent: a member can bind-mount / into a
 # container and walk out as root. Acceptable here because $SUDO_USER already
 # has full sudo — it grants no new authority, it just removes the typing.
@@ -60,7 +75,7 @@ fi
 systemctl enable --now docker containerd >/dev/null 2>&1
 echo "· docker enabled at boot"
 
-# --- 5. prove it works ----------------------------------------------------
+# --- 6. prove it works ----------------------------------------------------
 if docker run --rm hello-world >/dev/null 2>&1; then
   echo "· hello-world ran clean"
 else
