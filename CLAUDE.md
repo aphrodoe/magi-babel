@@ -33,6 +33,11 @@ rather than assuming; don't restate it back into this file.**
   `secrets/caddy.env`, which has to exist on cipher *and* on MAGI.
 - **`~/homelab` on MAGI is a read-only-deploy-key clone.** `git pull` there; pushes come
   from cipher.
+- **Wifi does not survive a warm reboot.** The RTL8822CE wedges in D3cold and probes
+  with `-114`; only a full power-off restores it, and no driver reload helps.
+  `05-hw-quirks.sh` disables both its power-saving states (PCIe ASPM and radio LPS),
+  which stops the bus-error storm that otherwise makes the console unusable — but not
+  this. **If wifi is the path that matters, power the box off and on, never `reboot`.**
 - **A power cut longer than the battery (~3–4 h) needs a human.** The BIOS has no
   AC-restore option, so MAGI stays off until the power button is pressed. It shuts down
   cleanly at 2%. Don't design around auto-recovery from a long outage.
