@@ -75,6 +75,7 @@ with a Let's Encrypt wildcard cert and no port open on the campus network.
 | magi | **unattended-upgrades** | Automatic security patches. |
 | magi | **Docker + Compose v2** | Container runtime. Logs capped at 3 x 10M each. |
 | magi | **Caddy** | Reverse proxy on the tailnet. Wildcard cert for `*.lab.akhildhyani.me`, DNS-01 via deSEC. |
+| magi | **magi-netaccess.timer** | Keeps MAGI logged into the campus 24online portal; the wired link is dead without it. |
 
 Containerised services land here as they come up.
 

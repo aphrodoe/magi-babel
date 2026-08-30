@@ -20,23 +20,31 @@ rather than assuming; don't restate it back into this file.**
   doesn't, so anything that names MAGI names it that way. If the tailnet is down, use
   MAGI's own keyboard; it is a laptop. On cipher, WARP tolerates Tailscale only because
   `*.tailscale.com` is in its split-tunnel exclude list — don't reset that.
-- **Network is settled.** Campus wired via a USB-C adapter; the wall port is **open** —
-  no 802.1X, no captive portal, no proxy. `config/netplan/10-magi-net.yaml` matches `en*`
-  so the adapter and a phone tether are interchangeable; install it with
-  `scripts/magi/10-network.sh`, never by editing `/etc/netplan`. `wlo1` on `IITJ_WLAN`
-  (WPA2-Enterprise) is a dormant fallback on a higher route metric, set up by `30-wifi.sh`.
+- **The wall port is behind a captive portal, not open.** No 802.1X, but a 24online
+  walled garden: a Webcat/Skein proxy answers *every* HTTP request with a login page and
+  refuses TCP/443 until you authenticate. Unauthenticated it looks exactly like a dead
+  network — DHCP, DNS, ICMP and every packet size fine, nothing that matters working.
+  `scripts/magi/35-netaccess.sh` logs in (over **HTTPS** — plain-HTTP POSTs are 302'd to
+  the servlet's own https URL with an empty body) and `magi-netaccess.timer` re-checks
+  every 2 min, because the session is bound to the DHCP lease, not to the boot.
+  `config/netplan/10-magi-net.yaml` matches `en*` so the adapter and a phone tether are
+  interchangeable; install it with `scripts/magi/10-network.sh`, never by editing
+  `/etc/netplan`. `wlo1` on `IITJ_WLAN` (WPA2-Enterprise) is the fallback at a higher
+  route metric, set up by `30-wifi.sh`.
 - **Never hardcode `1.1.1.1`.** On campus wifi that address *is* the DHCP server — it
   answers as local infrastructure, not Cloudflare — and on wired it times out. Use the
   DHCP-supplied resolver everywhere, containers included.
-- **Two files R2 cannot regenerate**, both deliberately outside the repo: the wifi
-  credentials in root-only `/etc/netplan/30-magi-wifi.yaml`, and the deSEC API token in
-  `secrets/caddy.env`, which has to exist on cipher *and* on MAGI.
+- **Three files R2 cannot regenerate**, all deliberately outside the repo: the wifi
+  credentials in root-only `/etc/netplan/30-magi-wifi.yaml`, the deSEC API token in
+  `secrets/caddy.env` (needed on cipher *and* on MAGI), and the campus net-access
+  credentials in root-only `/etc/magi/netaccess.env`.
 - **`~/homelab` on MAGI is a read-only-deploy-key clone.** `git pull` there; pushes come
   from cipher.
-- **Wifi needs ~3 minutes to associate after any boot.** WPA2-Enterprise PEAP cycles
-  through several campus BSSIDs, with driver-level auth rejections along the way, before
-  `CTRL-EVENT-EAP-SUCCESS`. Measured 169 s. Nothing is wrong during that window — if
-  wifi is the only path, MAGI is simply unreachable until it finishes. `05-hw-quirks.sh`
+- **Wifi associates in ~10 s normally, ~170 s the first time.** WPA2-Enterprise PEAP
+  is slow on a cold cache — it cycles through several campus BSSIDs with driver-level
+  auth rejections before `CTRL-EVENT-EAP-SUCCESS` — but once the PMK is cached it comes
+  back in about ten seconds. Nothing is wrong during the slow window; don't diagnose a
+  wifi fault until well past three minutes. `05-hw-quirks.sh`
   disables the card's PCIe ASPM, without which it storms the bus with `CmpltTO` errors
   fast enough to make the console unusable. **Do not add `disable_lps_deep=1`** — it
   kills the card ~30 s after association and only a full power-off recovers it.
