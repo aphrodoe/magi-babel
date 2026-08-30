@@ -1,0 +1,36 @@
+services:
+  caddy:
+    build: .
+    image: magi/caddy-desec:2
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      # Bound to the tailnet address on purpose. Docker's iptables rules run
+      # BEFORE ufw's, so a bare "443:443" would open the port on the campus
+      # LAN no matter what ufw says. The IP is MAGI's permanent Tailscale
+      # address (see CLAUDE.md) — it does not move when the DHCP lease does.
+      - "100.94.219.53:80:80"
+      - "100.94.219.53:443:443"
+    env_file:
+      - ../../secrets/caddy.env
+    volumes:
+      - ../../config/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data      # issued certs and the ACME account key live here
+      - caddy_config:/config
+    networks: [edge]
+
+  # Throwaway proof-of-life: echoes the request back. Delete once a real
+  # service is behind the proxy.
+  whoami:
+    image: traefik/whoami
+    container_name: whoami
+    restart: unless-stopped
+    networks: [edge]
+
+networks:
+  edge:
+    name: edge
+
+volumes:
+  caddy_data:
+  caddy_config:

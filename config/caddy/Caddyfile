@@ -1,0 +1,21 @@
+# One wildcard cert for *.lab.akhildhyani.me, proven over DNS-01 because the
+# names resolve to a Tailscale address Let's Encrypt cannot reach.
+{
+	acme_dns desec {
+		token {env.DESEC_TOKEN}
+	}
+}
+
+*.lab.akhildhyani.me {
+	@whoami host whoami.lab.akhildhyani.me
+	handle @whoami {
+		reverse_proxy whoami:80
+	}
+
+	# Anything under the wildcard with nothing behind it. Without this Caddy
+	# would serve an empty 200 and you'd waste an hour wondering which layer
+	# ate the request.
+	handle {
+		respond "MAGI: no service is mounted at {host}" 404
+	}
+}
