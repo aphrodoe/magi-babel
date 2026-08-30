@@ -10,52 +10,36 @@ rather than assuming; don't restate it back into this file.**
 ## Where I am right now
 
 - **Phase: H-01 (the spine).** H-00 closed 2026-08-29. Docker and Caddy are up;
-  `*.lab.akhildhyani.me` has a wildcard cert. `lab.` is delegated to **deSEC** by an
-  NS record at Namecheap — the apex, Vercel and email never moved. **Published ports
-  must bind to `100.94.219.53`**, never bare: Docker's iptables rules run ahead of
-  ufw, so `"443:443"` would open the port on the campus LAN with ufw still saying
-  default-deny.
-- **MAGI is up:** HP 15s-fq5xxx, i5-1235U (10c/12t, Iris Xe), 2 × 4 GB DDR4-3200 with
-  **both slots full** (32 GB ceiling), 512 GB NVMe, **no Ethernet port**, battery 100%.
-  Ubuntu Server 26.04.1 LTS, LVM no LUKS, root expanded to 466 G. Keys-only SSH, ufw
-  default-deny, unattended-upgrades, lid-close ignored (`scripts/magi/20-harden.sh`).
-- **Reach it with `ssh magi`** — Tailscale (H-01, pulled forward) bridges cipher and
-  magi across different networks. On cipher, Tailscale and Cloudflare WARP coexist only
-  because `*.tailscale.com` is in WARP's split-tunnel exclude list; don't reset that.
-- **Network is settled.** MAGI sits on campus wired via a USB-C Ethernet adapter. The
-  wall port is **open** — no 802.1X, no captive portal, no proxy, and UDP passes (probed
-  with `scripts/magi/diag-net.sh`). Config is `config/netplan/10-magi-net.yaml`, matching
-  `en*` so the adapter and a phone tether are interchangeable; install it with
-  `scripts/magi/10-network.sh`, never by editing `/etc/netplan` directly.
-- **MAGI's address is `100.94.219.53`, not its DHCP lease.** Campus DHCP is out of our
-  control and the lease will move; the Tailscale IP and the MagicDNS name won't. Anything
-  that needs to name MAGI names it that way. This is why no DHCP reservation is needed.
+  `*.lab.akhildhyani.me` has a Let's Encrypt wildcard, DNS-01 via **deSEC** — which holds
+  `lab.` alone, by an NS record at Namecheap. Apex, Vercel and email never moved.
+- **MAGI:** HP 15s-fq5xxx, i5-1235U (10c/12t, Iris Xe), 2 × 4 GB DDR4-3200 with **both
+  slots full** (32 GB ceiling), 512 GB NVMe, **no Ethernet port**. Ubuntu Server 26.04.1
+  LTS, LVM no LUKS, root 466 G. Hardened by `scripts/magi/20-harden.sh`.
+- **Reach it with `ssh magi`, and only over the tailnet.** Port 22 is closed on the
+  physical NICs. **MAGI's address is `100.94.219.53`** — campus DHCP leases move, this
+  doesn't, so anything that names MAGI names it that way. If the tailnet is down, use
+  MAGI's own keyboard; it is a laptop. On cipher, WARP tolerates Tailscale only because
+  `*.tailscale.com` is in its split-tunnel exclude list — don't reset that.
+- **Network is settled.** Campus wired via a USB-C adapter; the wall port is **open** —
+  no 802.1X, no captive portal, no proxy. `config/netplan/10-magi-net.yaml` matches `en*`
+  so the adapter and a phone tether are interchangeable; install it with
+  `scripts/magi/10-network.sh`, never by editing `/etc/netplan`. `wlo1` on `IITJ_WLAN`
+  (WPA2-Enterprise) is a dormant fallback on a higher route metric, set up by `30-wifi.sh`.
 - **Never hardcode `1.1.1.1`.** On campus wifi that address *is* the DHCP server — it
-  answers as local infrastructure, not Cloudflare — and on wired it simply times out.
-  Use the DHCP-supplied resolver everywhere, containers included.
-- **Wifi is a dormant fallback, not a second active path.** `wlo1` is on `IITJ_WLAN`
-  (WPA2-Enterprise, PEAP/MSCHAPv2), configured by `scripts/magi/30-wifi.sh`. Wired wins
-  on route metric; wifi carries traffic only when the cable is out. **Its credentials
-  live only in root-only `/etc/netplan/30-magi-wifi.yaml` on MAGI** — deliberately not in
-  the repo, so a rebuild re-prompts for them. That is the one config R2 cannot regenerate.
-- **SSH is tailnet-only.** Port 22 is closed on the physical NICs; `20-harden.sh` drops
-  the OpenSSH rule once `tailscale0` has an address, and re-adds it if it doesn't. If the
-  tailnet is ever down, use MAGI's own keyboard — it is a laptop.
-- **MAGI has no repo of its own to edit** — `~/homelab` is a read-only-deploy-key clone
-  of this repo. `git pull` there; pushes come from cipher.
+  answers as local infrastructure, not Cloudflare — and on wired it times out. Use the
+  DHCP-supplied resolver everywhere, containers included.
+- **Two files R2 cannot regenerate**, both deliberately outside the repo: the wifi
+  credentials in root-only `/etc/netplan/30-magi-wifi.yaml`, and the deSEC API token in
+  `secrets/caddy.env`, which has to exist on cipher *and* on MAGI.
+- **`~/homelab` on MAGI is a read-only-deploy-key clone.** `git pull` there; pushes come
+  from cipher.
 - **A power cut longer than the battery (~3–4 h) needs a human.** The BIOS has no
   AC-restore option, so MAGI stays off until the power button is pressed. It shuts down
-  cleanly at 2% so nothing is lost. Don't design around auto-recovery from a long outage.
-- **Carried over from H-00: the RAM.** 2 × 8 GB DDR4-3200, a matched pair replacing both
-  4 GB sticks (§01). Nothing before H-08 needs it, which is why H-00 was closed without
-  it — but it is the one physical purchase still outstanding.
-- **DRAM and NAND are in a global shortage (checked 30 Aug 2026).** DDR4 kits are up
-  277–380% since Q1 2025 and NVMe ~115%; forecasts run past 2028. **Never quote this
-  repo's older price estimates as current** — `PURCHASES.md` holds the re-checked ones.
-  The knock-on design decision: R3's backup target is an **external HDD, not an SSD**.
-- **The domain is `akhildhyani.me`** (GitHub Student Pack, ₹0). Its DNS must be moved to
-  Cloudflare before H-01 — Namecheap won't give an API key to a free student account, and
-  DNS-01 needs one.
+  cleanly at 2%. Don't design around auto-recovery from a long outage.
+- **Still outstanding: the RAM.** 2 × 8 GB DDR4-3200 (§01) — blocks H-08, nothing
+  earlier. DRAM and NAND are in a global shortage (checked 30 Aug 2026), so **never quote
+  this repo's older price estimates as current**; `PURCHASES.md` holds the re-checked
+  ones. Knock-on decision: R3's backup target is an external **HDD, not an SSD**.
 
 <!-- Keep this block current. It is the one thing a fresh session can't infer. -->
 
@@ -78,6 +62,11 @@ rather than assuming; don't restate it back into this file.**
    disk R3 assumes can die, and it silently breaks R2 — the Proxmox rebuild's whole
    premise is that the lab regenerates *from this repo*. Run commands on MAGI over SSH
    freely; just don't let it become the only place a config lives.
+
+7. **Publish container ports bound to `100.94.219.53`, never bare.** Docker writes its
+   iptables rules ahead of ufw's chain, so `"443:443"` opens the port on the campus LAN
+   while ufw still reports default-deny. Binding to the tailnet address means the socket
+   never exists on the wall port. Nothing in ufw's own output will warn you.
 
 ## The two machines
 
