@@ -33,11 +33,13 @@ rather than assuming; don't restate it back into this file.**
   `secrets/caddy.env`, which has to exist on cipher *and* on MAGI.
 - **`~/homelab` on MAGI is a read-only-deploy-key clone.** `git pull` there; pushes come
   from cipher.
-- **Wifi does not survive a warm reboot.** The RTL8822CE wedges in D3cold and probes
-  with `-114`; only a full power-off restores it, and no driver reload helps.
-  `05-hw-quirks.sh` disables both its power-saving states (PCIe ASPM and radio LPS),
-  which stops the bus-error storm that otherwise makes the console unusable — but not
-  this. **If wifi is the path that matters, power the box off and on, never `reboot`.**
+- **Wifi needs ~3 minutes to associate after any boot.** WPA2-Enterprise PEAP cycles
+  through several campus BSSIDs, with driver-level auth rejections along the way, before
+  `CTRL-EVENT-EAP-SUCCESS`. Measured 169 s. Nothing is wrong during that window — if
+  wifi is the only path, MAGI is simply unreachable until it finishes. `05-hw-quirks.sh`
+  disables the card's PCIe ASPM, without which it storms the bus with `CmpltTO` errors
+  fast enough to make the console unusable. **Do not add `disable_lps_deep=1`** — it
+  kills the card ~30 s after association and only a full power-off recovers it.
 - **A power cut longer than the battery (~3–4 h) needs a human.** The BIOS has no
   AC-restore option, so MAGI stays off until the power button is pressed. It shuts down
   cleanly at 2%. Don't design around auto-recovery from a long outage.
@@ -130,6 +132,11 @@ GitOps by hand until H-10 automates it with Flux.
 - **Don't run destructive or outward-facing things without asking** — `docker compose down -v`,
   anything that deletes volumes, anything that opens a port to the internet.
 - **At the end of a working session, offer to draft the runbook entry** (see below).
+- **Never write a runbook entry or edit this file unless I run `/wrap`.** Not after
+  offering, not at a natural stopping point, not because the session looks finished.
+  Wait for the command. Writing up a result before it is confirmed puts something
+  false into the file that outlives the session — which is exactly what happened on
+  2026-08-30, when a fix was logged as validated and then failed minutes later.
 
 ## The runbook (R5)
 
