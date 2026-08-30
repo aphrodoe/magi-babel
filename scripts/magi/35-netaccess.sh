@@ -48,10 +48,17 @@ do_login() {
   [[ -n "$IP" ]] || IP=$(ip -4 -br addr show "$IF" | grep -oE '[0-9.]+/[0-9]+' | cut -d/ -f1)
   echo "· portal sees ip=$IP mac=${MAC:-unknown}"
 
-  curl --interface "$IF" -4 -sS -m 20 -o /dev/null \
+  # The portal's own JavaScript rewrites the username before submitting:
+  #   normalizeIitUsername()  ->  strips any @iitj.ac.in, then appends it.
+  # A browser therefore sends b24cs1005@iitj.ac.in, never the bare name, and the
+  # bare name is rejected. Do the same normalisation, idempotently.
+  local U="${NETACCESS_USER%@iitj.ac.in}@iitj.ac.in"
+
+  curl --interface "$IF" -4 -sS -m 20 -o /tmp/netaccess-last.html \
     -X POST "$PORTAL/24online/servlet/E24onlineHTTPClient" \
     --data-urlencode "mode=191" \
-    --data-urlencode "username=$NETACCESS_USER" \
+    --data-urlencode "username=$U" \
+    --data-urlencode "login=Login" \
     --data-urlencode "password=$NETACCESS_PASS" \
     --data-urlencode "mac=$MAC" \
     --data-urlencode "macaddress=$MAC" \
@@ -75,7 +82,9 @@ do_login() {
   if have_443 "$IF"; then
     echo "· logged in — 443 is open on $IF"
   else
-    echo "! login did not open 443. Wrong credentials, or the portal changed its form."
+    echo "! login did not open 443. The portal's reply is in /tmp/netaccess-last.html;"
+    echo "  grep it for a message before assuming the credentials are wrong."
+    grep -oE "alert\\('[^']*'\\)|<font color=[\"']?red[\"']?>[^<]*" /tmp/netaccess-last.html 2>/dev/null | head -3
     exit 1
   fi
 }
