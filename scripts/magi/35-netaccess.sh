@@ -13,7 +13,11 @@
 # Third file R2 cannot regenerate, after the wifi password and the deSEC token.
 set -euo pipefail
 CREDS=/etc/magi/netaccess.env
-PORTAL="http://netaccess.iitj.ac.in"
+# HTTPS, not HTTP. The servlet 302s every plain-HTTP POST to its own https:// URL
+# and the redirect body is empty, so an http:// POST silently does nothing. The
+# walled garden permits 443 to the portal host itself even while blocking it
+# everywhere else, and the certificate validates, so this needs no -k.
+PORTAL="https://netaccess.iitj.ac.in"
 UNIT=/etc/systemd/system/magi-netaccess.service
 TIMER=/etc/systemd/system/magi-netaccess.timer
 SELF="$(cd "$(dirname "$0")" && pwd)/$(basename "$0")"
