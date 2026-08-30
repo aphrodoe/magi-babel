@@ -9,9 +9,11 @@ rather than assuming; don't restate it back into this file.**
 
 ## Where I am right now
 
-- **Phase: H-01 (the spine).** H-00 closed 2026-08-29. Docker and Caddy are up;
+- **Phase: H-02 (the nervous system).** H-01 closed 2026-08-31. Docker and Caddy are up;
   `*.lab.akhildhyani.me` has a Let's Encrypt wildcard, DNS-01 via **deSEC** — which holds
-  `lab.` alone, by an NS record at Namecheap. Apex, Vercel and email never moved.
+  `lab.` alone, by an NS record at Namecheap. Apex, Vercel and email never moved. Adding
+  a service is a compose block plus three lines of Caddyfile — no DNS record, no cert,
+  no port. `whoami` is scaffolding and goes when H-03 puts Grafana behind the proxy.
 - **MAGI:** HP 15s-fq5xxx, i5-1235U (10c/12t, Iris Xe), 2 × 4 GB DDR4-3200 with **both
   slots full** (32 GB ceiling), 512 GB NVMe, **no Ethernet port**. Ubuntu Server 26.04.1
   LTS, LVM no LUKS, root 466 G. Hardened by `scripts/magi/20-harden.sh`.
