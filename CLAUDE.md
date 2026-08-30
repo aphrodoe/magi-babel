@@ -9,7 +9,12 @@ rather than assuming; don't restate it back into this file.**
 
 ## Where I am right now
 
-- **Phase: H-01 (the spine).** H-00 closed 2026-08-29. Nothing containerised yet.
+- **Phase: H-01 (the spine).** H-00 closed 2026-08-29. Docker and Caddy are up;
+  `*.lab.akhildhyani.me` has a wildcard cert. `lab.` is delegated to **deSEC** by an
+  NS record at Namecheap — the apex, Vercel and email never moved. **Published ports
+  must bind to `100.94.219.53`**, never bare: Docker's iptables rules run ahead of
+  ufw, so `"443:443"` would open the port on the campus LAN with ufw still saying
+  default-deny.
 - **MAGI is up:** HP 15s-fq5xxx, i5-1235U (10c/12t, Iris Xe), 2 × 4 GB DDR4-3200 with
   **both slots full** (32 GB ceiling), 512 GB NVMe, **no Ethernet port**, battery 100%.
   Ubuntu Server 26.04.1 LTS, LVM no LUKS, root expanded to 466 G. Keys-only SSH, ufw

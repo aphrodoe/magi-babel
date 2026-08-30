@@ -27,7 +27,8 @@ Prices re-checked 30 Aug 2026 against the DRAM/NAND shortage.
 reaches the network over campus wired with WPA2-Enterprise wifi behind it as a fallback,
 and answers only on the tailnet — port 22 is closed on the LAN. **One H-00 item is
 carried forward: the 2 × 8 GB DDR4-3200 upgrade, which blocks H-08 and nothing before it.**
-Nothing containerised yet.
+Docker and Caddy are running; `https://*.lab.akhildhyani.me` resolves over the tailnet
+with a Let's Encrypt wildcard cert and no port open on the campus network.
 
 ### MAGI — the homelab
 
@@ -72,6 +73,8 @@ Nothing containerised yet.
 | magi | **OpenSSH** | Keys only. Password auth off. |
 | magi | **ufw** | Default-deny inbound; SSH, `tailscale0`, 41641/udp allowed. |
 | magi | **unattended-upgrades** | Automatic security patches. |
+| magi | **Docker + Compose v2** | Container runtime. Logs capped at 3 x 10M each. |
+| magi | **Caddy** | Reverse proxy on the tailnet. Wildcard cert for `*.lab.akhildhyani.me`, DNS-01 via deSEC. |
 
 Containerised services land here as they come up.
 
