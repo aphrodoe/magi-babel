@@ -15,13 +15,17 @@ set -euo pipefail
 # Same bug was fixed in-tree for the 8821CE (commit 24f5e38a13b5).
 if [[ -e /sys/module/rtw88_pci ]] || modinfo rtw88_pci >/dev/null 2>&1; then
   cat > /etc/modprobe.d/rtw88-aspm.conf <<'EOF'
-# See scripts/magi/05-hw-quirks.sh. Two separate power-saving states on the same
-# card, and both have to go — turning off only the PCIe one still left the radio
-# stuck, logging "firmware failed to leave lps state" and ~28 bus errors a minute.
+# See scripts/magi/05-hw-quirks.sh.
+#
+# disable_lps_deep=1 was tried here on 2026-08-30 to silence "firmware failed to
+# leave lps state" and made things strictly worse: the card came up, associated,
+# and then hard-failed ~30s later with an endless "failed to send h2c command"
+# storm ending in "mac power on failed". Recovering it needs a full power-off.
+# ASPM alone leaves the card noisy in the log but working. Do not re-add it
+# without a way to test for longer than two minutes.
 options rtw88_pci disable_aspm=1
-options rtw88_core disable_lps_deep=1
 EOF
-  echo "· modprobe.d: rtw88_pci disable_aspm=1, rtw88_core disable_lps_deep=1"
+  echo "· modprobe.d: rtw88_pci disable_aspm=1"
 
   # Take effect now if the driver is loaded — but not if wifi is currently the
   # only way off the box, because unloading it would cut the SSH session doing
