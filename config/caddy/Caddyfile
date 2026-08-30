@@ -1,12 +1,22 @@
 # One wildcard cert for *.lab.akhildhyani.me, proven over DNS-01 because the
 # names resolve to a Tailscale address Let's Encrypt cannot reach.
-{
-	acme_dns desec {
-		token {env.DESEC_TOKEN}
-	}
-}
 
 *.lab.akhildhyani.me {
+	tls {
+		dns desec {
+			token {env.DESEC_TOKEN}
+		}
+
+		# deSEC's secondary nameserver replicates ~60s behind its primary
+		# (measured 2026-08-30: ns1 at 13s, ns2 at 71s). Let's Encrypt
+		# validates from several vantage points and may ask either one, so
+		# submitting the challenge immediately fails on ns2 with
+		# "During secondary validation: No TXT record found".
+		# Wait past the lag before asking LE to look.
+		propagation_delay 150s
+		propagation_timeout 10m
+	}
+
 	@whoami host whoami.lab.akhildhyani.me
 	handle @whoami {
 		reverse_proxy whoami:80
