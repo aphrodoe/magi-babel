@@ -41,8 +41,13 @@ do_login() {
   # Ask the portal what it thinks our MAC and IP are, rather than guessing —
   # it reports the address it will bind the session to, which is not always the
   # interface's own MAC.
-  local PAGE MAC IP
-  PAGE=$(curl --interface "$IF" -4 -sS -m 12 -L "$PORTAL/24online/webpages/client.jsp" 2>/dev/null || true)
+  # One cookie jar across both requests. The servlet issues a JSESSIONID with the
+  # login page and expects it back on the POST; two separate curl calls looked
+  # like two unrelated visitors and the POST was bounced with a 302.
+  local JAR PAGE MAC IP
+  JAR=$(mktemp); trap 'rm -f "$JAR"' RETURN
+  PAGE=$(curl --interface "$IF" -4 -sS -m 12 -L -c "$JAR" -b "$JAR" \
+           "$PORTAL/24online/webpages/client.jsp" 2>/dev/null || true)
   MAC=$(printf '%s' "$PAGE" | grep -oE "name=[\"']macaddress[\"'] value='[^']*'" | grep -oE "'[^']*'$" | tr -d "'")
   IP=$(printf  '%s' "$PAGE" | grep -oE "name=[\"']ipaddress[\"'] value='[^']*'"  | grep -oE "'[^']*'$" | tr -d "'")
   [[ -n "$IP" ]] || IP=$(ip -4 -br addr show "$IF" | grep -oE '[0-9.]+/[0-9]+' | cut -d/ -f1)
@@ -54,7 +59,9 @@ do_login() {
   # bare name is rejected. Do the same normalisation, idempotently.
   local U="${NETACCESS_USER%@iitj.ac.in}@iitj.ac.in"
 
-  curl --interface "$IF" -4 -sS -m 20 -o /tmp/netaccess-last.html \
+  curl --interface "$IF" -4 -sS -m 20 -L -c "$JAR" -b "$JAR" \
+    -e "$PORTAL/24online/webpages/client.jsp" \
+    -o /tmp/netaccess-last.html \
     -X POST "$PORTAL/24online/servlet/E24onlineHTTPClient" \
     --data-urlencode "mode=191" \
     --data-urlencode "username=$U" \
