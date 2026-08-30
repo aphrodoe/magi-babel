@@ -15,14 +15,20 @@ set -euo pipefail
 # Same bug was fixed in-tree for the 8821CE (commit 24f5e38a13b5).
 if [[ -e /sys/module/rtw88_pci ]] || modinfo rtw88_pci >/dev/null 2>&1; then
   cat > /etc/modprobe.d/rtw88-aspm.conf <<'EOF'
-# See scripts/magi/05-hw-quirks.sh. Without this the card storms the PCIe bus
-# with completion timeouts as soon as it carries real traffic.
+# See scripts/magi/05-hw-quirks.sh. Two separate power-saving states on the same
+# card, and both have to go — turning off only the PCIe one still left the radio
+# stuck, logging "firmware failed to leave lps state" and ~28 bus errors a minute.
 options rtw88_pci disable_aspm=1
+options rtw88_core disable_lps_deep=1
 EOF
-  echo "· modprobe.d: rtw88_pci disable_aspm=1"
+  echo "· modprobe.d: rtw88_pci disable_aspm=1, rtw88_core disable_lps_deep=1"
 
-  # Take effect now if the driver is loaded, rather than waiting for a reboot.
-  if lsmod | grep -q '^rtw88_pci'; then
+  # Take effect now if the driver is loaded — but not if wifi is currently the
+  # only way off the box, because unloading it would cut the SSH session doing
+  # the unloading. In that case the options apply at the next boot.
+  if ip route | grep -q '^default.*dev wl'; then
+    echo "! wifi is the only default route — not reloading. Reboot to apply."
+  elif lsmod | grep -q '^rtw88_pci'; then
     DRV=$(lsmod | awk '/^rtw88_8822c/{print $1; exit}')
     modprobe -r "${DRV:-rtw88_8822ce}" 2>/dev/null || true
     modprobe -r rtw88_pci             2>/dev/null || true
