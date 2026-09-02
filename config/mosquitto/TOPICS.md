@@ -13,7 +13,7 @@ Settled 2026-09-02, H-02.
 ```
 magi/
   status                    online | offline          retained, LWT
-  sys/{cpu,mem,temp,load,uptime,disk}
+  sys/{cpu,mem,temp,load,uptime,disk,batt,power}
   svc/<service>/state       up | down | degraded
   backup/{state,pct}
   sky/
@@ -41,6 +41,10 @@ homeassistant/...           HA autodiscovery owns this namespace
 ```
 
 ## Rules
+
+**MAGI is a laptop, and the tree says so.** `sys/batt` and `sys/power` (`ac` |
+`battery`) exist because a power cut longer than the battery needs a human, and nothing
+else on the bus can say the clock is running.
 
 **Roots are callsigns.** `magi/`, `babel-2588/`, and every H-10 cluster node when it
 gets one. Two exceptions, both deliberate: `mesh/` is a fabric rather than a host, and
