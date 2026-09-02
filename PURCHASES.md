@@ -11,6 +11,11 @@ both driven by AI datacenter demand), so anything with memory or flash in it is
 R6: **buy what unblocks the next phase, nothing else.** The exception is AliExpress
 (3–6 weeks plus customs) — order those one phase early. Nothing before H-05 is AliExpress.
 
+**Two things were researched and deliberately not bought** (MASTERPLAN §H-08): a Jetson
+Orin Nano Super, which is $249 abroad and ₹37,200–39,999 here, and a used desktop with a
+used RTX 3060, which wins on tokens per rupee but is a second always-on machine at
+150–200 W. Both are faster than MAGI. Neither is needed for work that runs at 3 AM.
+
 ---
 
 ## Buy next — H-01 → H-05
@@ -116,7 +121,8 @@ scissors job.
 
 | Item | ₹ | Buy when |
 |---|--:|---|
-| 2 × 8 GB DDR4-3200, matched pair | 12,000+ | **H-08.** Nothing before it needs the bandwidth. Shortage; expect to pay more later, not less. |
+| 2 × 8 GB DDR4-3200, matched pair | 12,000+ | **H-08.** Nothing before it needs the bandwidth. Shortage; expect to pay more later, not less. Buy a *matched pair* — one 16 GB stick is single channel and halves the Oracle's token rate. |
+| Pi 5 16 GB + Raspberry Pi AI HAT+ 2 | ~30,000 | **Only if H-08's measured prefill on MAGI is too slow** — see MASTERPLAN §H-08. The silicon is fine; the model zoo is the constraint. HAT alone is ₹13,989 at Hubtronics, out of stock 2 Sep 2026. Doubles as an H-10 node. |
 | 7.5″ e-paper 800×480 + driver | 7,000–9,000 | Once the SPI TFT prototype has told you which six numbers belong on a wall. |
 | Gigabit switch + Cat6 | 1,500–2,300 | **H-10**, second machine. One wall port, one machine, until then. |
 | RTL-SDR Blog V3 + dipole | 4,800–5,500 | **H-06.** |

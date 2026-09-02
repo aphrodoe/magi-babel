@@ -151,7 +151,9 @@ Numbering is build order. Don't skip; each phase depends on the last.
 Before a single container.
 
 - **RAM → 16 GB.** Both slots hold 4 GB DDR4-3200, so this is a *replacement*, not an
-  addition: buy 2 × 8 GB as a matched kit and keep dual channel (§01). ~₹2,000–3,000.
+  addition: buy 2 × 8 GB as a matched kit and keep dual channel (§01). **The price moved
+  badly — see `PURCHASES.md`, re-checked 30 Aug 2026: ₹12,000+, and rising.** DRAM is in
+  a global shortage; this is now the single most expensive line in the homelab.
 - **USB-to-Ethernet adapter.** ✅ *Done — already owned.* This chassis has no RJ45, and
   the built-in Realtek RTL8822CE runs on Linux's `rtw88` driver, which has a long record
   of power-save dropouts and flaky reconnects. Fine for a laptop; not something an
@@ -430,6 +432,57 @@ unusable for chat and completely fine for batch jobs that run at 3 AM.
 - Give it a job, don't build a chatbot: nightly log digest, RAG over your own
   runbook, coursework triage, Whisper transcription. Wire `magi/oracle/state`
   to the violet LED.
+
+#### The accelerator question — researched 2 Sep 2026
+
+**Decode speed is memory bandwidth ÷ model size.** Every token reads the whole model
+out of memory once, so that one line predicts nearly every number below; real systems
+land at 50–70% of the ceiling. It is also *why* a single 16 GB stick halves the token
+rate — one stick is single channel, which is half the bus.
+
+| Platform | Bandwidth | 8B Q4 ceiling | Measured |
+|---|--:|--:|--:|
+| Raspberry Pi 5 (LPDDR4X-4267, 32-bit) | ~17 GB/s | 3.6 | 2–5 on a *3B* |
+| **MAGI** — i5-1235U, 2 × DDR4-3200 | 51.2 GB/s | 10.9 | **6–10 on Iris Xe / Vulkan** |
+| Jetson Orin Nano Super (LPDDR5, 128-bit) | 102 GB/s | 21.7 | 14–15 on a 7B |
+| Used RTX 3060 12 GB (GDDR6, 192-bit) | 360 GB/s | 77 | 30–40 |
+| M1 Ultra Mac Studio | 800 GB/s | 170 | 10–18 on a *70B* |
+
+This is why TOPS figures mislead. Forty TOPS buys nothing if the weights cannot be read
+fast enough.
+
+**The Raspberry Pi AI HAT+ 2 is not the AI HAT+.** The original carried a Hailo-8 — a
+vision NPU with no memory of its own, which genuinely cannot run an LLM. The AI HAT+ 2
+carries a **Hailo-10H with 8 GB of its own LPDDR4X** and does: Llama 3 8B at ~11 tok/s,
+Phi-2 at ~19, in a 2.5 W envelope. **The catch is the model supply, not the silicon.**
+No downloadable 8B HEF exists in Hailo's zoo, a GGUF cannot be copied to the device, and
+community models shimmed through `hailo-ollama` collapse to ~2.65 tok/s on a 3B — four
+times *slower* than a native 8B. You would be buying into a model zoo, not an ecosystem.
+
+| | Option | India, Sep 2026 | 8B tok/s | Also buys |
+|---|---|--:|--:|---|
+| **A** | MAGI + the RAM already planned | 12,000+ *(already committed)* | 6–10 | nothing new to maintain |
+| **B** | Pi 5 16 GB + AI HAT+ 2 | ~30,000 | 2.6–8 realistic | an H-10 node; 2.5 W |
+| **C** | Jetson Orin Nano Super 8 GB | 37,200–39,999 | 14–15 | CUDA, no compile gate |
+| **D** | Used SFF desktop + used RTX 3060 12 GB | ~22,000–25,000 | 30–40 | most tokens per rupee |
+
+**Take A, and buy nothing else yet.** The RAM already unblocks this phase, which is R6
+exactly, and the finding that changes the picture is that Iris Xe under Vulkan measures
+6–10 tok/s on a 7–8B — the *top* of this section's CPU-only estimate, on silicon already
+in the box. H-08's jobs are batch. A nightly digest needs tokens per night, not tokens
+per second.
+
+**But measure prefill before concluding A is enough.** For RAG over the runbook and a
+30k-token log digest, *prompt processing* dominates, and prefill is compute-bound rather
+than bandwidth-bound — the one regime where a weak iGPU is weakest and an accelerator
+helps most. Generation tok/s is the number everyone quotes and the wrong one for this
+workload. Time the real digest once the RAM lands; that number decides whether B happens.
+
+If it does, **B is the option that fits this project** — cheapest of the three, 2.5 W in
+a box that runs 24/7, and it becomes an H-10 node afterwards. C is better silicon that
+India prices out of sense ($249 abroad, ₹37k here). D wins on raw ₹/token and would be
+the answer in a different project, but it is a second always-on machine at 150–200 W,
+and MAGI is a laptop that cannot take a card.
 
 #### If you get club access to the M1 Ultra Mac Studio
 
@@ -800,7 +853,9 @@ ask() {
 ```
 
 Same command, same interface. Borrowed compute at the top, your own machine in the
-middle, the deck's own silicon at the bottom. Nothing breaks; capability just
+middle, the deck's own silicon at the bottom. **The middle tier is the one that has to
+hold**, and as of Sep 2026 it does: MAGI's Iris Xe runs an 8B at 6–10 tok/s under Vulkan
+once the RAM lands, for no hardware beyond the RAM (H-08). Nothing breaks; capability just
 degrades. That is genuinely how good distributed systems are designed, and you'll
 have built one by accident.
 
