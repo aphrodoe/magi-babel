@@ -161,11 +161,25 @@ Before a single container.
   the `r8152` driver — recovers from carrier loss in 4 s and survived eight connector
   bounces on replug without wedging. It occupies MAGI's only USB-C port, which is the
   real cost, and why `IITJ_WLAN` on `wlo1` stays worth doing eventually.
-- **The campus wall port is open.** ✅ *Verified with `scripts/magi/diag-net.sh`.* No
-  802.1X, no captive portal, no proxy; UDP passes (so Tailscale gets a direct path) and
-  ~64 Mbps measured. The username-and-password on campus applies to the wifi, not this.
-  Campus does block public DNS resolvers — `1.1.1.1` times out — so use the
-  DHCP-supplied resolver and never hardcode one in a container.
+- **The campus wall port is behind a captive portal.** ❌ *This entry originally read
+  "the wall port is open — no 802.1X, no captive portal, no proxy," verified with
+  `diag-net.sh`. That was wrong, and how it was wrong is the lesson.* There is no
+  802.1X, but there is a **24online walled garden**: a Webcat/Skein proxy answers every
+  HTTP request with a login page and refuses TCP/443 until you authenticate. The
+  diagnostic passed because it ran on a session someone had already authenticated —
+  DHCP, DNS, ICMP and every packet size come back clean either way, so **unauthenticated
+  it looks exactly like a working network with nothing working on it.** The first reboot
+  took a new DHCP lease, killed the session, and cost an evening (`runbook/001-log.md`,
+  30–31 Aug).
+  `scripts/magi/35-netaccess.sh` logs in — over **HTTPS**, because plain-HTTP POSTs are
+  302'd to the servlet's own https URL with an empty body — and `magi-netaccess.timer`
+  re-checks every 2 min, since the session is bound to the lease and not to the boot.
+  The campus username and password apply here *as well as* to the wifi.
+  **Never hardcode `1.1.1.1`:** on campus wifi that address *is* the DHCP server and
+  answers as local infrastructure; on wired it times out. Use the DHCP-supplied resolver
+  everywhere, containers included.
+  **The general rule this earned:** a diagnostic that runs on state you did not create
+  proves nothing. Re-run it from a cold lease before writing ✅ anywhere.
 - **~~DHCP reservation~~ — dropped, and it's worth knowing why.** The item assumed a
   router you administer. Campus DHCP isn't yours to configure, and reserving is
   unnecessary anyway: Tailscale gives MAGI a fixed `100.x` address and a MagicDNS name
