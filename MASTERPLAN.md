@@ -215,7 +215,7 @@ Before a single container.
 
 ---
 
-### H-01 — THE SPINE · ₹800–1,500/yr
+### H-01 — THE SPINE · ₹0
 Docker + Compose. **Tailscale** (this is your remote access — do not port-forward
 from a dorm network).
 
@@ -229,12 +229,20 @@ cert on `*.lab.yourdomain.tld` — pointed at private IPs.
 > **Domain: `akhildhyani.me`, already owned** via the GitHub Student Developer Pack.
 > ₹0, so this phase costs nothing.
 >
-> **But move DNS to Cloudflare before starting.** The Student Pack `.me` is registered
-> through Namecheap, and Namecheap only enables its API for accounts with 20+ domains,
-> a $50 balance, or $50 spent in two years — none of which a free student domain has.
-> No API means Caddy cannot answer a DNS-01 challenge there. Keep Namecheap as the
-> registrar, point the nameservers at Cloudflare (free), and use Caddy's Cloudflare
-> DNS module. Discover this now, not halfway through the phase.
+> **DNS: delegate `lab.` to deSEC. ❌ *This originally said "move DNS to Cloudflare
+> before starting" — that does not work, and the reason is worth keeping.*** Namecheap
+> only enables its API for accounts with 20+ domains, a $50 balance, or $50 spent in two
+> years, none of which a free student domain has — so Caddy cannot answer a DNS-01
+> challenge there. That part was right. The fix was not: **Cloudflare's free plan will
+> not host a subdomain as its own zone**, and moving the whole apex drags Vercel and the
+> email forwarding along with it. What works is delegating `lab.akhildhyani.me` *alone*
+> — two NS records at Namecheap pointing at **deSEC**, which does take a subdomain zone
+> and has a free API. Apex, Vercel and email never move. Done 30 Aug 2026.
+>
+> **Then the part no provider documents:** deSEC replicates to its secondary about a
+> minute behind its primary, and Let's Encrypt validates from several perspectives at
+> once — so DNS-01 fails repeatedly unless Caddy waits for the record to spread.
+> `propagation_delay 150s` in the Caddyfile is the fix. Renewals are slow, not fragile.
 
 Result:
 
@@ -268,6 +276,17 @@ magi/light/cmd                    the only write topic
 
 Everything after this point is a publisher or a subscriber. The LEDs, the wall
 panel, your phone notifications, the deck — all just clients. That's the design.
+
+**Settled 2 Sep 2026 — the tree above is the sketch, `config/mosquitto/TOPICS.md` is the
+schema.** Three things were missing here, and all three are invisible until something is
+already publishing. No **liveness convention**: every publisher needs a retained `status`
+registered as its Last Will, or nothing on the bus can tell "the sensor reads zero" from
+"the sensor died last week". No **retained-vs-event rule**: retain an alert and the strip
+strobes at a three-week-old attack on every reconnect, while failing to retain state
+leaves the wall panel blank until the next tick. And `magi/light/cmd` as "the only write
+topic" does not survive A-01 — Home Assistant writes too. The rule that replaced it is
+`…/set` as the only writable suffix everywhere, which is also what makes the ACL one line
+instead of twelve.
 
 ### H-03 — THE GLASS · ₹0
 Prometheus + node_exporter + cAdvisor + Grafana + Loki/Promtail + Uptime Kuma.
@@ -476,7 +495,7 @@ times *slower* than a native 8B. You would be buying into a model zoo, not an ec
 | | Option | India, Sep 2026 | 8B tok/s | Also buys |
 |---|---|--:|--:|---|
 | **A** | MAGI + the RAM already planned | 12,000+ *(already committed)* | 6–10 | nothing new to maintain |
-| **B** | Pi 5 16 GB + AI HAT+ 2 | ~30,000 | 2.6–8 realistic | an H-10 node; 2.5 W |
+| **B** | Pi 5 16 GB + AI HAT+ 2 | 30,000–40,000 | 2.6–8 realistic | an H-10 node; 2.5 W |
 | **C** | Jetson Orin Nano Super 8 GB | 37,200–39,999 | 14–15 | CUDA, no compile gate |
 | **D** | Used SFF desktop + used RTX 3060 12 GB | ~22,000–25,000 | 30–40 | most tokens per rupee |
 
@@ -491,6 +510,11 @@ per second.
 than bandwidth-bound — the one regime where a weak iGPU is weakest and an accelerator
 helps most. Generation tok/s is the number everyone quotes and the wrong one for this
 workload. Time the real digest once the RAM lands; that number decides whether B happens.
+
+B's range is wide because of the Pi 5 scarcity markup in §09: an *8 GB* board was
+₹16,625–20,349 at Indian retailers in Aug 2026 against an $80 list price, and a 16 GB
+board carries the DRAM shortage on top of that. Price it the week you buy, not from this
+table.
 
 If it does, **B is the option that fits this project** — cheapest of the three, 2.5 W in
 a box that runs 24/7, and it becomes an H-10 node afterwards. C is better silicon that
