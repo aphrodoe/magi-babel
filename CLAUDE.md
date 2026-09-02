@@ -9,11 +9,14 @@ rather than assuming; don't restate it back into this file.**
 
 ## Where I am right now
 
-- **Phase: H-02 (the nervous system).** H-01 closed 2026-08-31. Docker and Caddy are up;
-  `*.lab.akhildhyani.me` has a Let's Encrypt wildcard, DNS-01 via **deSEC** — which holds
-  `lab.` alone, by an NS record at Namecheap. Apex, Vercel and email never moved. Adding
-  a service is a compose block plus three lines of Caddyfile — no DNS record, no cert,
-  no port. `whoami` is scaffolding and goes when H-03 puts Grafana behind the proxy.
+- **Phase: H-03 (the glass).** H-02 closed 2026-09-03. Mosquitto is up with auth and
+  ACLs on its own `bus` network; `magi-sys.service` publishes `magi/sys/*` and
+  `magi/svc/*`. **`config/mosquitto/TOPICS.md` is the naming rule for everything that
+  follows — read it before adding any publisher.** Caddy serves `*.lab.akhildhyani.me`
+  on a Let's Encrypt wildcard, DNS-01 via **deSEC**, which holds `lab.` alone by an NS
+  record at Namecheap; apex, Vercel and email never moved. Adding a service is a compose
+  block plus three lines of Caddyfile — no DNS record, no cert, no port. `whoami` is
+  scaffolding and goes when Grafana lands.
 - **MAGI:** HP 15s-fq5xxx, i5-1235U (10c/12t, Iris Xe), 2 × 4 GB DDR4-3200 with **both
   slots full** (32 GB ceiling), 512 GB NVMe, **no Ethernet port**. Ubuntu Server 26.04.1
   LTS, LVM no LUKS, root 466 G. Hardened by `scripts/magi/20-harden.sh`.
@@ -36,10 +39,12 @@ rather than assuming; don't restate it back into this file.**
 - **Never hardcode `1.1.1.1`.** On campus wifi that address *is* the DHCP server — it
   answers as local infrastructure, not Cloudflare — and on wired it times out. Use the
   DHCP-supplied resolver everywhere, containers included.
-- **Three files R2 cannot regenerate**, all deliberately outside the repo: the wifi
+- **Five files R2 cannot regenerate**, all deliberately outside the repo: the wifi
   credentials in root-only `/etc/netplan/30-magi-wifi.yaml`, the deSEC API token in
-  `secrets/caddy.env` (needed on cipher *and* on MAGI), and the campus net-access
-  credentials in root-only `/etc/magi/netaccess.env`.
+  `secrets/caddy.env` (needed on cipher *and* on MAGI), the campus net-access
+  credentials in root-only `/etc/magi/netaccess.env`, the Mosquitto password file
+  `secrets/mosquitto/passwd`, and the broker credentials the publisher reads from
+  root-only `/etc/magi/mqtt.env`.
 - **`~/homelab` on MAGI is a read-only-deploy-key clone.** `git pull` there; pushes come
   from cipher.
 - **Wifi associates in ~10 s normally, ~170 s the first time.** WPA2-Enterprise PEAP

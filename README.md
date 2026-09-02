@@ -23,7 +23,9 @@ Prices re-checked 30 Aug 2026 against the DRAM/NAND shortage.
 
 ## Progress
 
-**Phase H-02 · the nervous system.** H-01 is done: Docker and Caddy are up, and
+**Phase H-03 · the glass.** H-02 is done: Mosquitto is up with auth and ACLs, and the
+topic schema was settled on paper before anything published — every service from here on
+is a publisher or a subscriber to it. H-01 before it put Docker and Caddy up, so
 `https://*.lab.akhildhyani.me` resolves over the tailnet with a Let's Encrypt wildcard
 cert issued over DNS-01 — no port open on the campus network, and adding a service is a
 compose block plus three lines of Caddyfile. Underneath it, MAGI runs Ubuntu Server
@@ -37,7 +39,7 @@ forward: the 2 × 8 GB DDR4-3200 upgrade, which blocks H-08 and nothing before i
 |:--|:--|:--|--:|
 | ✅ | **H-00** | Groundwork — install, network, hardening, `git init` · *RAM upgrade still to buy* | ₹0–4k |
 | ✅ | **H-01** | The Spine — Docker, Tailscale, Caddy, wildcard TLS | ₹0 |
-| ⬜ | **H-02** | The Nervous System — Mosquitto, the MQTT topic tree | ₹0 |
+| ✅ | **H-02** | The Nervous System — Mosquitto, the MQTT topic tree | ₹0 |
 | ⬜ | **H-03** | The Glass — Prometheus, Grafana, Loki, Uptime Kuma | ₹0 |
 | ⬜ | **H-04** | The House — Jellyfin, Immich, Vaultwarden, Paperless | ₹0 |
 | ⬜ | **H-05** | Ambient Telemetry — ESP32-S3, LED strip, wall panel | ₹1.5–2.5k |
@@ -77,6 +79,8 @@ forward: the 2 × 8 GB DDR4-3200 upgrade, which blocks H-08 and nothing before i
 | magi | **Docker + Compose v2** | Container runtime. Logs capped at 3 x 10M each. |
 | magi | **Caddy** | Reverse proxy on the tailnet. Wildcard cert for `*.lab.akhildhyani.me`, DNS-01 via deSEC. |
 | magi | **magi-netaccess.timer** | Keeps MAGI logged into the campus 24online portal; the wired link is dead without it. |
+| magi | **Mosquitto** | The message bus. Auth + ACLs, tailnet-only, retained state on disk. Schema: `config/mosquitto/TOPICS.md`. |
+| magi | **magi-sys.service** | Publishes MAGI's own vitals and container state to `magi/sys/*` and `magi/svc/*`. |
 
 Containerised services land here as they come up.
 
