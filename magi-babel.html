@@ -543,7 +543,7 @@ dl.glosslist{margin:20px 0}
     <ul>
       <li><strong>RAM → 16 GB.</strong> Surveyed: 2 × 4 GB DDR4-3200, <em>both slots full</em>, 32 GB ceiling. A replacement, not an addition — buy a matched pair and keep dual channel.</li>
       <li><strong>USB-C ethernet adapter</strong> (RTL8153). No RJ45 on this chassis, and <code>rtw88</code> wifi is too flaky for an always-on box.</li>
-      <li><strong>Campus wall port is open</strong> — no 802.1X, no captive portal, no proxy, UDP passes. Verified, not assumed.</li>
+      <li><strong>Campus wall port is behind a captive portal.</strong> <em>This originally read "open — no 802.1X, no captive portal, no proxy. Verified, not assumed." It was wrong, and how it was wrong is the lesson.</em> No 802.1X, but a <strong>24online walled garden</strong>: every HTTP request gets a login page and TCP/443 is refused until you authenticate. The check passed because it ran on a session someone had already authenticated — DHCP, DNS, ICMP and every packet size come back clean either way, so unauthenticated it looks exactly like a working network with nothing working on it. <code>35-netaccess.sh</code> logs in over HTTPS; a timer re-checks every 2 min, because the session is bound to the DHCP lease and not to the boot. <strong>A diagnostic that runs on state you did not create proves nothing.</strong></li>
       <li><strong><s>DHCP reservation</s> — dropped.</strong> It assumed a router you administer. Tailscale's <code>100.x</code> address and MagicDNS name survive every network, which beats a reservation that holds on one LAN. Never write a campus IP into a compose file.</li>
       <li><strong>Lid-close behaviour</strong>: <code>HandleLidSwitch=ignore</code> in <code>/etc/systemd/logind.conf</code>. Lid shut, screen off, machine awake.</li>
       <li><strong>The laptop battery is your UPS.</strong> 41,050 mWh, 100% health, ~3–4 h of ride-through at idle. Don't buy a UPS.</li>
@@ -568,16 +568,23 @@ dl.glosslist{margin:20px 0}
   </div>
 
   <div class="phase">
-    <div class="phase-h"><span class="id">H-01</span><span class="ti">The Spine</span><span class="cost">₹800–1,500/yr</span></div>
+    <div class="phase-h"><span class="id">H-01</span><span class="ti">The Spine</span><span class="cost">₹0</span></div>
     <p>Docker + Compose. <strong>Tailscale</strong> for remote access — do not port-forward from a dorm network.</p>
     <div class="card hi">
       <span class="lbl">Caddy, not Nginx Proxy Manager</span>
       <p>NPM is friendlier for ten minutes, then its entire configuration lives in a SQLite blob that isn't in your git repo. Caddy is a fifteen-line Caddyfile that <em>is</em>, and it does automatic HTTPS. This is R1 in practice.</p>
     </div>
-    <p>Then the first genuine wow moment: <strong>buy a real domain</strong> (~₹1,000/yr) and use <strong>DNS-01 ACME</strong> for a wildcard cert on <code>*.lab.yourdomain.tld</code>, pointed at private IPs.</p>
+    <p>Then the first genuine wow moment: a real domain — <code>akhildhyani.me</code>, free with the Student Pack — and <strong>DNS-01 ACME</strong> for a wildcard cert on <code>*.lab.akhildhyani.me</code>, pointed at private IPs.</p>
     <pre><code>https://jellyfin.lab.yourname.dev    valid cert, green padlock
 https://grafana.lab.yourname.dev     no port numbers, no warnings</code></pre>
-    <div class="buy"><span class="k">Needs</span><span class="v">akhildhyani.me — owned</span><span class="p">₹0 · Student Pack · move DNS to Cloudflare</span></div>
+    <div class="buy"><span class="k">Needs</span><span class="v">akhildhyani.me — owned</span><span class="p">₹0 · Student Pack · delegate <code>lab.</code> to deSEC</span></div>
+
+    <div class="card crit">
+      <span class="lbl">Not Cloudflare — this plan's original advice, and it doesn't work</span>
+      <p>The Namecheap half was right: their API needs 20+ domains, a $50 balance, or $50 spent in two years, none of which a free student domain has — so Caddy cannot answer a DNS-01 challenge there. The fix was wrong. <strong>Cloudflare's free plan will not host a subdomain as its own zone</strong>, and moving the whole apex drags Vercel and the email forwarding along with it.</p>
+      <p>What works: delegate <code>lab.akhildhyani.me</code> <em>alone</em> — two NS records at Namecheap pointing at <strong>deSEC</strong>, which does take a subdomain zone and has a free API. Apex, Vercel and email never move. Done 30 Aug 2026.</p>
+      <p><strong>Then the part no provider documents.</strong> deSEC replicates to its secondary about a minute behind its primary, and Let's Encrypt validates from several perspectives at once — so DNS-01 fails repeatedly unless Caddy waits for the record to spread. <code>propagation_delay 150s</code> is the fix. Renewals are slow, not fragile.</p>
+    </div>
     <div class="plain"><span class="plabel">In plain English</span>
       <p>A <b>container</b> is an app plus everything it needs, sealed into one package you start and stop with one command. Break it, delete it, start a fresh one — nothing else is touched. That's why a homelab can be reckless and still be safe. <b>Docker Compose</b> is the text file listing which containers you want and how they're wired.</p>
       <p><b>Tailscale</b> makes all your devices behave as though plugged into the same home router, wherever they are. <b>Port-forwarding</b> is the old way and it puts your laptop on the open internet for anyone to find.</p>
@@ -609,6 +616,15 @@ babel-2588/{online,batt,pos,rssi}     the cyberdeck, when it's home
 mesh/&lt;node&gt;/msg                   LoRa traffic
 magi/agent/{state,awaiting}    the agent layer, §05
 magi/light/cmd                 the only write topic</code></pre>
+
+    <div class="card crit">
+      <span class="lbl">Settled 2 Sep 2026 — the tree above is the sketch, not the schema</span>
+      <p>Three things were missing, and all three are invisible until something is already publishing.</p>
+      <p><strong>No liveness convention.</strong> Every publisher needs a retained <code>status</code> registered as its Last Will, or nothing on the bus can tell "the sensor reads zero" from "the sensor died last week".</p>
+      <p><strong>No retained-vs-event rule.</strong> Retain an alert and the strip strobes at a three-week-old attack on every reconnect; fail to retain state and the wall panel is blank until the next tick. State retained, events not.</p>
+      <p><strong><code>magi/light/cmd</code> as "the only write topic" does not survive A-01</strong> — Home Assistant writes too. The rule that replaced it is <code>…/set</code> as the only writable suffix everywhere, which is also what makes the ACL one line instead of twelve.</p>
+      <p>The schema now lives in <code>config/mosquitto/TOPICS.md</code>.</p>
+    </div>
     <div class="plain"><span class="plabel">In plain English</span>
       <p><b>MQTT</b> is a noticeboard. Any program pins a value to a named spot; any other program subscribes to that spot and is told the moment it changes.</p>
       <p>The point is that nothing needs to know about anything else. The LED strip doesn't know what Prometheus is — it just watches the board. That's why you can add a new gadget in six months without rewriting a thing. The topic names above are the contract everything agrees on.</p>
@@ -786,6 +802,35 @@ magi/light/cmd                 the only write topic</code></pre>
       <li>Embeddings + <strong>pgvector</strong> — prefer it over FAISS; you'll want Postgres anyway</li>
       <li>Wire <code>magi/oracle/state</code> to the violet LED</li>
     </ul>
+
+    <div class="card hi">
+      <span class="lbl">The accelerator question — researched 2 Sep 2026</span>
+      <p><strong>Decode speed is memory bandwidth ÷ model size.</strong> Every token reads the whole model out of memory once, so that one line predicts nearly every number below; real systems land at 50–70% of the ceiling. It is also <em>why</em> a single 16 GB stick halves the token rate — one stick is single channel, which is half the bus.</p>
+      <div class="tbl-w"><table>
+        <thead><tr><th>Platform</th><th class="num">Bandwidth</th><th class="num">8B Q4 ceiling</th><th class="num">Measured</th></tr></thead>
+        <tbody>
+          <tr><td>Raspberry Pi 5 <span class="mono" style="font-size:.75rem;color:var(--ink3)">LPDDR4X-4267, 32-bit</span></td><td class="num">~17 GB/s</td><td class="num">3.6</td><td class="num">2–5 on a <em>3B</em></td></tr>
+          <tr><td><strong>MAGI</strong> — i5-1235U <span class="mono" style="font-size:.75rem;color:var(--ink3)">2 × DDR4-3200</span></td><td class="num">51.2 GB/s</td><td class="num">10.9</td><td class="num"><strong>6–10 on Iris Xe</strong></td></tr>
+          <tr><td>Jetson Orin Nano Super <span class="mono" style="font-size:.75rem;color:var(--ink3)">LPDDR5, 128-bit</span></td><td class="num">102 GB/s</td><td class="num">21.7</td><td class="num">14–15 on a 7B</td></tr>
+          <tr><td>Used RTX 3060 12 GB <span class="mono" style="font-size:.75rem;color:var(--ink3)">GDDR6, 192-bit</span></td><td class="num">360 GB/s</td><td class="num">77</td><td class="num">30–40</td></tr>
+          <tr><td>M1 Ultra Mac Studio</td><td class="num">800 GB/s</td><td class="num">170</td><td class="num">10–18 on a <em>70B</em></td></tr>
+        </tbody>
+      </table></div>
+      <p>This is why TOPS figures mislead. Forty TOPS buys nothing if the weights cannot be read fast enough.</p>
+      <p><strong>The Raspberry Pi AI HAT+ 2 is not the AI HAT+.</strong> The original carried a Hailo-8 — a vision NPU with no memory of its own, which genuinely cannot run an LLM. The AI HAT+ 2 carries a <strong>Hailo-10H with 8 GB of its own LPDDR4X</strong> and does: Llama 3 8B at ~11 tok/s, Phi-2 at ~19, in a 2.5 W envelope. <strong>The catch is the model supply, not the silicon.</strong> No downloadable 8B HEF exists in Hailo's zoo, a GGUF cannot be copied to the device, and community models shimmed through <code>hailo-ollama</code> collapse to ~2.65 tok/s on a 3B — four times <em>slower</em> than a native 8B. You would be buying into a model zoo, not an ecosystem.</p>
+      <div class="tbl-w"><table>
+        <thead><tr><th>Option</th><th class="num">India, Sep 2026</th><th class="num">8B tok/s</th><th>Verdict</th></tr></thead>
+        <tbody>
+          <tr><td><strong>A</strong> · MAGI + the RAM already planned</td><td class="num">12,000+ <em>(committed)</em></td><td class="num">6–10</td><td><span class="verdict v-buy">Take this</span> Nothing new to maintain, and the RAM already unblocks the phase.</td></tr>
+          <tr><td><strong>B</strong> · Pi 5 16 GB + AI HAT+ 2</td><td class="num">30,000–40,000</td><td class="num">2.6–8 realistic</td><td><span class="verdict v-maybe">Only if prefill is too slow</span> Cheapest accelerator, 2.5 W, and it becomes an H-10 node.</td></tr>
+          <tr><td><strong>C</strong> · Jetson Orin Nano Super 8 GB</td><td class="num">37,200–39,999</td><td class="num">14–15</td><td><span class="verdict v-skip">Priced out</span> $249 abroad, ₹37k here. Better silicon, wrong country.</td></tr>
+          <tr><td><strong>D</strong> · Used SFF desktop + used RTX 3060 12 GB</td><td class="num">22,000–25,000</td><td class="num">30–40</td><td><span class="verdict v-skip">Wrong shape</span> Most tokens per rupee by far, but a second always-on machine at 150–200 W.</td></tr>
+        </tbody>
+      </table></div>
+      <p><strong>Take A, and buy nothing else yet.</strong> The RAM already unblocks this phase, which is R6 exactly, and the finding that changes the picture is that Iris Xe under Vulkan measures 6–10 tok/s on a 7–8B — the <em>top</em> of this section's CPU-only estimate, on silicon already in the box. H-08's jobs are batch: a nightly digest needs tokens per night, not tokens per second.</p>
+      <p><strong>But measure prefill before concluding A is enough.</strong> For RAG over the runbook and a 30k-token log digest, <em>prompt processing</em> dominates, and prefill is compute-bound rather than bandwidth-bound — the one regime where a weak iGPU is weakest and an accelerator helps most. Generation tok/s is the number everyone quotes and the wrong one for this workload. Time the real digest once the RAM lands; that number decides whether B happens.</p>
+      <p>B's range is wide because of the Pi 5 scarcity markup in §09: an <em>8 GB</em> board was ₹16,625–20,349 at Indian retailers in Aug 2026 against an $80 list price, and a 16 GB board carries the DRAM shortage on top. Price it the week you buy, not from this table.</p>
+    </div>
 
     <div class="card hi">
       <span class="lbl">If you get club access to the M1 Ultra Mac Studio</span>
