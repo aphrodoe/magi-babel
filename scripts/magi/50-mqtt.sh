@@ -18,6 +18,11 @@ set -euo pipefail
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 STACK="$REPO/compose/mosquitto/compose.yaml"
 
+# mosquitto_pub / mosquitto_sub on the host — the telemetry publisher needs
+# them, and so does every debugging session. Clients only; the broker itself
+# runs in the container. (`snap install mosquitto` would install a second one.)
+dpkg -s mosquitto-clients >/dev/null 2>&1 || sudo apt-get install -y mosquitto-clients
+
 sudo chown 1883:1883 "$REPO/config/mosquitto/acl"
 sudo chmod 0640      "$REPO/config/mosquitto/acl"
 
