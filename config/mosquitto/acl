@@ -1,0 +1,27 @@
+# Access control. Written against the tree in TOPICS.md — restructuring topics
+# means rewriting this file, not just renaming.
+#
+# Deny is the default: a user gets exactly what is listed here and nothing else.
+#
+# Pattern for adding a device: it may WRITE only its own subtree, and READ
+# whatever it needs to react to. A sensor that can publish anywhere is a sensor
+# that can lie about the rest of the lab.
+
+# You, from cipher: mosquitto_sub -t '#' and anything else.
+user admin
+topic readwrite #
+
+# MAGI's own telemetry and service state.
+user magi
+topic write magi/#
+topic read #
+
+# --- devices, as they arrive -------------------------------------------------
+# H-05, the LED strip. It reports what it is showing; it does not report
+# anything else. It subscribes broadly because reacting to the whole lab is
+# its entire job.
+#
+# user esp32
+# topic write magi/light/status
+# topic write magi/light/state
+# topic read #

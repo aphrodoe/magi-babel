@@ -1,0 +1,28 @@
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: mosquitto
+    restart: unless-stopped
+    ports:
+      # Tailnet address only — see the note in compose/caddy/compose.yaml.
+      # A bare "1883:1883" would put an MQTT broker on the campus LAN.
+      - "100.94.219.53:1883:1883"
+    volumes:
+      - ../../config/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ../../config/mosquitto/acl:/mosquitto/config/acl:ro
+      # Not in git. Generate with scripts/cipher/mqtt-passwd.sh, then copy to
+      # MAGI — one of the files R2 cannot regenerate.
+      - ../../secrets/mosquitto/passwd:/mosquitto/config/passwd:ro
+      - mosquitto_data:/mosquitto/data
+    networks: [bus]
+
+networks:
+  # The nervous system's own network. Every future MQTT client — Home Assistant,
+  # Frigate, the ADS-B feeder — joins this as `external: true` and reaches the
+  # broker at `mosquitto:1883`. Deliberately not `edge`: Caddy does not proxy
+  # MQTT, and keeping the buses separate keeps Suricata's scope (rule 3) honest.
+  bus:
+    name: bus
+
+volumes:
+  mosquitto_data:
