@@ -42,6 +42,10 @@ homeassistant/...           HA autodiscovery owns this namespace
 
 ## Rules
 
+**`degraded` means running but not right** — a container marked `(unhealthy)` by its
+own healthcheck, or stuck in a restart loop. Distinct from `down`, because the two want
+different reactions: `down` is "start it", `degraded` is "look at it".
+
 **MAGI is a laptop, and the tree says so.** `sys/batt` and `sys/power` (`ac` |
 `battery`) exist because a power cut longer than the battery needs a human, and nothing
 else on the bus can say the clock is running.

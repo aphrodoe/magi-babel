@@ -18,6 +18,7 @@ out an interval.
 import glob
 import os
 import shutil
+import subprocess
 import sys
 import time
 
@@ -65,6 +66,38 @@ def battery():
         return None, None
 
 
+def services():
+    """{'magi/svc/<name>/state': 'up' | 'down' | 'degraded'}
+
+    Shelling out to `docker ps` rather than pulling in the Docker SDK: one
+    subprocess every 15 s costs about 30 ms and adds no dependency.
+    """
+    try:
+        out = subprocess.run(
+            ["docker", "ps", "-a", "--format", "{{.Names}}\t{{.State}}\t{{.Status}}"],
+            capture_output=True, text=True, timeout=10, check=True,
+        ).stdout
+    except (OSError, subprocess.SubprocessError):
+        # Docker unreachable. Publish nothing rather than declaring every
+        # service down — we cannot tell a socket hiccup from a dead daemon,
+        # and a false "down" is worse than a stale "up".
+        return {}
+
+    states = {}
+    for line in out.splitlines():
+        name, _, rest = line.partition("\t")
+        state, _, status = rest.partition("\t")
+        if state == "running":
+            # `docker ps` puts healthcheck results in Status: "Up 2 days (unhealthy)".
+            value = "degraded" if "(unhealthy)" in status else "up"
+        elif state == "restarting":
+            value = "degraded"
+        else:
+            value = "down"          # exited, dead, created, paused
+        states[f"magi/svc/{name}/state"] = value
+    return states
+
+
 def sample(prev):
     total, idle = cpu_sample()
     pt, pi = prev
@@ -92,7 +125,7 @@ def main():
     if "--once" in sys.argv:
         time.sleep(1)                    # a CPU delta needs two samples
         _, values = sample(prev)
-        for topic, value in values.items():
+        for topic, value in {**values, **services()}.items():
             print(f"{topic} {value}")
         return
 
@@ -112,10 +145,22 @@ def main():
     c.connect(BROKER, 1883, keepalive=INTERVAL * 2)
     c.loop_start()
 
+    seen = set()
     while True:
         time.sleep(INTERVAL)
         prev, values = sample(prev)
-        for topic, value in values.items():
+        svc = services()
+
+        # A container that was removed leaves its retained state behind, still
+        # claiming "up" forever. A zero-length retained publish deletes it.
+        # Guarded on `svc` being non-empty so a failed docker query does not
+        # wipe the whole branch.
+        if svc:
+            for topic in seen - set(svc):
+                c.publish(topic, None, qos=1, retain=True)
+            seen = set(svc)
+
+        for topic, value in {**values, **svc}.items():
             if value is not None:
                 c.publish(topic, value, qos=0, retain=True)
 
