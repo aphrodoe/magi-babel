@@ -18,10 +18,15 @@ UNIT=/etc/systemd/system/magi-sys.service
 # after every message, so the broker would never fire the will.
 dpkg -s python3-paho-mqtt >/dev/null 2>&1 || sudo apt-get install -y python3-paho-mqtt
 
-if [ ! -f "$ENVF" ] || [ "${1:-}" = --reset ]; then
+# `sudo test`, not `test`: /etc/magi is 0700 root, so an unprivileged -f check
+# reports "missing" for a file that is right there and re-prompts every run.
+if ! sudo test -f "$ENVF" || [ "${1:-}" = --reset ]; then
   read -rsp "MQTT password for user 'magi': " PASS; echo
   sudo install -d -m 700 /etc/magi
-  printf 'MQTT_USER=magi\nMQTT_PASS=%s\n' "$PASS" | sudo install -m 600 /dev/stdin "$ENVF"
+  # Create it empty at 0600 first, then write into it. The password is never
+  # on disk at looser permissions and never passes through a temp file.
+  sudo install -m 600 /dev/null "$ENVF"
+  printf 'MQTT_USER=magi\nMQTT_PASS=%s\n' "$PASS" | sudo tee "$ENVF" >/dev/null
   unset PASS
 fi
 
