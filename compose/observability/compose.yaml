@@ -1,0 +1,90 @@
+services:
+  prometheus:
+    image: prom/prometheus:v3
+    container_name: prometheus
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      # 30 days of 15s samples across ~3 exporters is a couple of GB. Cheap on
+      # a 466 G root, and long enough to see "it got slower after X".
+      - --storage.tsdb.retention.time=30d
+      # Needed so Caddy's reverse_proxy can serve the UI at the site root.
+      - --web.external-url=https://prom.lab.akhildhyani.me
+    volumes:
+      - ../../config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    networks: [glass, edge]
+
+  # Host metrics: CPU, memory, disk, filesystems, network interfaces.
+  #
+  # network_mode: host, not a bridge. /proc/net is per-namespace, so a bridged
+  # exporter reports the CONTAINER's network stats no matter how much of the
+  # host's /proc you mount at it — you'd get eth0 doing nothing and no wlo1 at
+  # all. Host namespace is the only way to see the real interfaces.
+  #
+  # That means no port publishing and no docker-proxy, so ufw's rules DO apply
+  # here (unlike a published port — see rule 7). Belt and braces anyway: bind
+  # the listener to the tailnet address so the socket never exists on the wall
+  # port. ip_nonlocal_bind is already set, so this survives starting before
+  # tailscale0 comes up at boot.
+  node-exporter:
+    image: prom/node-exporter:v1
+    container_name: node-exporter
+    restart: unless-stopped
+    network_mode: host
+    pid: host
+    command:
+      - --path.rootfs=/host
+      - --web.listen-address=100.94.219.53:9100
+    volumes:
+      - /:/host:ro,rslave
+
+  # Per-container CPU/memory/IO. magi-sys.py already answers "is it up"; this
+  # answers "which one is eating the box".
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.55.1
+    container_name: cadvisor
+    restart: unless-stopped
+    privileged: true          # needs to read every cgroup, not just its own
+    devices:
+      - /dev/kmsg
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks: [glass]
+
+  grafana:
+    image: grafana/grafana:13.0
+    container_name: grafana
+    restart: unless-stopped
+    # Datasources and dashboards come from files under config/grafana, not from
+    # clicks in the UI (R1) — a datasource that exists only in grafana.db is a
+    # datasource the rebuild loses.
+    env_file:
+      - ../../secrets/grafana.env
+    environment:
+      # Grafana builds absolute redirect URLs from this. Without it, logging in
+      # through Caddy bounces you to http://localhost:3000.
+      GF_SERVER_ROOT_URL: https://grafana.lab.akhildhyani.me
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ../../config/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ../../dashboards:/var/lib/grafana/dashboards:ro
+      - grafana_data:/var/lib/grafana
+    networks: [glass, edge]
+
+networks:
+  # Prometheus, cAdvisor and Grafana talk to each other here and nowhere else.
+  glass:
+    name: glass
+  # Caddy's network, defined in compose/caddy. Only Prometheus and Grafana join
+  # it — cAdvisor has no business being reachable from the proxy.
+  edge:
+    external: true
+
+volumes:
+  prometheus_data:
+  grafana_data:

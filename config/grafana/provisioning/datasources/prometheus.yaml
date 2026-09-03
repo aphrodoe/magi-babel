@@ -1,0 +1,12 @@
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    # Container name on the `glass` network — Grafana reaches Prometheus
+    # directly, not back out through Caddy.
+    url: http://prometheus:9090
+    isDefault: true
+    # Lets a later edit of this file win over whatever is in grafana.db.
+    editable: false

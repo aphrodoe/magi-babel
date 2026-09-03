@@ -1,0 +1,26 @@
+# Scrape targets are named the way everything else here is: by callsign.
+# `instance: magi` is what shows up in Grafana legends, so it matters.
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    host: magi
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
+        labels: { instance: magi }
+
+  # Host namespace, so this is a real address rather than a container name.
+  # See the comment on the node-exporter service.
+  - job_name: node
+    static_configs:
+      - targets: ["100.94.219.53:9100"]
+        labels: { instance: magi }
+
+  - job_name: cadvisor
+    static_configs:
+      - targets: ["cadvisor:8080"]
+        labels: { instance: magi }
