@@ -81,6 +81,13 @@ forward: the 2 × 8 GB DDR4-3200 upgrade, which blocks H-08 and nothing before i
 | magi | **magi-netaccess.timer** | Keeps MAGI logged into the campus 24online portal; the wired link is dead without it. |
 | magi | **Mosquitto** | The message bus. Auth + ACLs, tailnet-only, retained state on disk. Schema: `config/mosquitto/TOPICS.md`. |
 | magi | **magi-sys.service** | Publishes MAGI's own vitals and container state to `magi/sys/*` and `magi/svc/*`. |
+| magi | **Prometheus** | Metrics, 30d retention. Scrapes node_exporter, cAdvisor and itself. `prom.lab.akhildhyani.me`. |
+| magi | **node_exporter** | Host metrics. Host network namespace, so it sees the real interfaces. |
+| magi | **cAdvisor** | Per-container CPU, memory and IO — which one is eating the box. |
+| magi | **Grafana** | The glass. Datasources and dashboards provisioned from files, not clicks. `grafana.lab.akhildhyani.me`. |
+| magi | **Loki** | Logs, 30d retention. No UI of its own — Grafana's Explore is the interface. |
+| magi | **Alloy** | Ships logs to Loki from the docker socket and journald. Replaces Promtail, EOL March 2026. |
+| magi | **Uptime Kuma** | Probes the public hostnames, so it notices a dead cert or lapsed DNS. `status.lab.akhildhyani.me`. |
 
 Containerised services land here as they come up.
 
