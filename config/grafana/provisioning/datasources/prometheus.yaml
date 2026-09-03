@@ -1,5 +1,14 @@
 apiVersion: 1
 
+# Removed before the datasources below are applied. Provisioning can create a
+# datasource and it can update one, but it cannot repoint an existing one at a
+# new uid — it looks the record up *by* uid, doesn't find it, and Grafana exits
+# rather than starting with a half-applied config. Deleting first makes this
+# file authoritative instead of merely advisory.
+deleteDatasources:
+  - name: Prometheus
+    orgId: 1
+
 datasources:
   - name: Prometheus
     # Fixed, because dashboards in dashboards/ reference it by uid. Let
