@@ -46,6 +46,15 @@ loki.source.docker "containers" {
 loki.relabel "journal" {
   forward_to = []
 
+  // A rule with no source_labels matches unconditionally and writes the
+  // replacement literally. Needed because loki.source.journal defaults `job`
+  // to its own component id ("loki.source.journal.host") and that default
+  // beats the labels argument below.
+  rule {
+    target_label = "job"
+    replacement  = "systemd"
+  }
+
   rule {
     source_labels = ["__journal__systemd_unit"]
     target_label  = "unit"
@@ -60,6 +69,6 @@ loki.relabel "journal" {
 loki.source.journal "host" {
   path          = "/var/log/journal"
   relabel_rules = loki.relabel.journal.rules
-  labels        = { job = "systemd", host = "magi" }
+  labels        = { host = "magi" }
   forward_to    = [loki.write.default.receiver]
 }
