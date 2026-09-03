@@ -16,8 +16,8 @@ reloaded, a DNS delegation that lapsed.
 | Grafana | HTTP(s) | `https://grafana.lab.akhildhyani.me` | redirects to `/login`; accept 200 |
 | Prometheus | HTTP(s) | `https://prom.lab.akhildhyani.me/-/healthy` | its own liveness endpoint |
 | Mosquitto | TCP Port | `mosquitto` : `1883` | container name — reached over `bus` |
-| Loki | HTTP(s) | `http://loki:3100/ready` | no public hostname by design |
-| MAGI wall port | HTTP(s) | `https://1.1.1.1` (or any external) | catches the captive portal expiring |
+| Loki | HTTP(s) | `http://loki:3100/ready` | no public hostname by design; reached over `glass` |
+| Wall port | HTTP(s) | `https://connectivity-check.ubuntu.com` | catches the captive portal expiring. **Not 1.1.1.1** — on campus wifi that address is the DHCP server, not Cloudflare (CLAUDE.md) |
 
 Interval 60 s, retries 2. Anything tighter just fills Loki with probe noise.
 

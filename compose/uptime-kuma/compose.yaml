@@ -5,15 +5,18 @@ services:
     restart: unless-stopped
     volumes:
       - uptime_kuma:/app/data
-    # `edge` so Caddy can serve it and so it can probe the public hostnames;
-    # `bus` so it can open a TCP check against mosquitto:1883 without going
-    # back out through the host and into ufw.
-    networks: [edge, bus]
+    # One network per thing it has to reach: `edge` so Caddy can serve it and
+    # so it can probe the public hostnames, `bus` for a TCP check against
+    # mosquitto:1883, `glass` for Loki — which has no public hostname by
+    # design. All of it stays off the host, so ufw is never in the path.
+    networks: [edge, bus, glass]
 
 networks:
   edge:
     external: true
   bus:
+    external: true
+  glass:
     external: true
 
 volumes:
