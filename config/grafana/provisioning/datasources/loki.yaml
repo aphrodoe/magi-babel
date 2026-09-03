@@ -1,0 +1,11 @@
+apiVersion: 1
+
+datasources:
+  - name: Loki
+    # Set now, not later. Changing a provisioned uid after the fact needs a
+    # deleteDatasources block — see prometheus.yaml.
+    uid: loki
+    type: loki
+    access: proxy
+    url: http://loki:3100
+    editable: false

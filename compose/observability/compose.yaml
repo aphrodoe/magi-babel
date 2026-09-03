@@ -56,6 +56,38 @@ services:
       - /var/lib/docker/:/var/lib/docker:ro
     networks: [glass]
 
+  loki:
+    image: grafana/loki:3
+    container_name: loki
+    restart: unless-stopped
+    command: -config.file=/etc/loki/loki.yaml
+    volumes:
+      - ../../config/loki/loki.yaml:/etc/loki/loki.yaml:ro
+      - loki_data:/loki
+    networks: [glass]
+
+  # Reads logs, labels them, pushes them to Loki. Runs as root because it needs
+  # the docker socket (root:docker 0660) and the journal, and because a log
+  # shipper that can only see its own logs is furniture.
+  alloy:
+    image: grafana/alloy:v1.19.2
+    container_name: alloy
+    restart: unless-stopped
+    user: root
+    command:
+      - run
+      - /etc/alloy/config.alloy
+      - --storage.path=/var/lib/alloy/data
+    volumes:
+      - ../../config/alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/log/journal:/var/log/journal:ro
+      # journald keys its entries by machine id; without this the journal
+      # reader opens the files and finds nothing addressed to it.
+      - /etc/machine-id:/etc/machine-id:ro
+      - alloy_data:/var/lib/alloy/data
+    networks: [glass]
+
   grafana:
     image: grafana/grafana:13.0
     container_name: grafana
@@ -93,3 +125,5 @@ networks:
 volumes:
   prometheus_data:
   grafana_data:
+  loki_data:
+  alloy_data:

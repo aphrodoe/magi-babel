@@ -1,0 +1,49 @@
+# Single-binary Loki on local disk. No object store, no ring, no microservices —
+# one box, one process. Everything here that looks like distributed-systems
+# ceremony (replication_factor, the inmemory ring) is Loki insisting on having
+# the knob even when there is only one of it.
+
+auth_enabled: false
+
+server:
+  http_listen_port: 3100
+  log_level: warn
+
+common:
+  path_prefix: /loki
+  storage:
+    filesystem:
+      chunks_directory: /loki/chunks
+      rules_directory: /loki/rules
+  replication_factor: 1
+  ring:
+    kvstore:
+      store: inmemory
+
+schema_config:
+  configs:
+    - from: 2026-01-01
+      store: tsdb
+      object_store: filesystem
+      schema: v13
+      index:
+        prefix: index_
+        period: 24h
+
+limits_config:
+  # Matches Prometheus's 30d, so a metric spike and the logs around it expire
+  # together. Nothing is more annoying than a graph you cannot explain.
+  retention_period: 30d
+  # journald hands us entries from before Alloy started. Without this, Loki
+  # rejects them and the first minutes after every restart are a hole.
+  reject_old_samples: false
+
+compactor:
+  working_directory: /loki/compactor
+  # retention_period above does nothing unless the compactor is told to act
+  # on it. Loki will happily keep everything forever otherwise.
+  retention_enabled: true
+  delete_request_store: filesystem
+
+analytics:
+  reporting_enabled: false

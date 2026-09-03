@@ -41,7 +41,7 @@ sudo ufw allow from 172.16.0.0/12 to 100.94.219.53 port 9100 proto tcp \
 docker compose -f "$STACK" up -d
 # Bind mounts don't trigger a recreate, so a changed prometheus.yml or
 # provisioning file needs this to take effect (same reason as 50-mqtt.sh).
-docker compose -f "$STACK" restart prometheus grafana
+docker compose -f "$STACK" restart prometheus grafana loki alloy
 
 # Caddy learned two new hostnames; it reloads config on restart.
 docker compose -f "$REPO/compose/caddy/compose.yaml" restart caddy

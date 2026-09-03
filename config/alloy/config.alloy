@@ -1,0 +1,65 @@
+// Alloy, not Promtail: Promtail reached end of life in March 2026. Same job —
+// find logs, label them, push them to Loki — in Grafana's newer agent.
+
+logging {
+  level = "warn"
+}
+
+loki.write "default" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}
+
+// ---- container logs -------------------------------------------------------
+
+discovery.docker "containers" {
+  host = "unix:///var/run/docker.sock"
+}
+
+// Docker reports names with a leading slash ("/grafana"). Strip it, or every
+// label in Grafana's dropdown reads like a filesystem path.
+discovery.relabel "containers" {
+  targets = discovery.docker.containers.targets
+
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/(.*)"
+    target_label  = "container"
+  }
+}
+
+loki.source.docker "containers" {
+  host       = "unix:///var/run/docker.sock"
+  targets    = discovery.relabel.containers.output
+  labels     = { job = "docker", host = "magi" }
+  forward_to = [loki.write.default.receiver]
+}
+
+// ---- host logs ------------------------------------------------------------
+// The reason this phase is worth doing. magi-netaccess's captive-portal
+// retries, wpa_supplicant's slow PEAP association, kernel PCIe errors — all
+// journald, none of it visible in `docker logs`.
+
+// forward_to is empty on purpose: this block exists only to export `rules`,
+// which loki.source.journal consumes below. It is not a pipeline stage.
+loki.relabel "journal" {
+  forward_to = []
+
+  rule {
+    source_labels = ["__journal__systemd_unit"]
+    target_label  = "unit"
+  }
+
+  rule {
+    source_labels = ["__journal_priority_keyword"]
+    target_label  = "level"
+  }
+}
+
+loki.source.journal "host" {
+  path          = "/var/log/journal"
+  relabel_rules = loki.relabel.journal.rules
+  labels        = { job = "systemd", host = "magi" }
+  forward_to    = [loki.write.default.receiver]
+}
