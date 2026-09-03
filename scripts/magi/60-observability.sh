@@ -29,8 +29,14 @@ fi
 # bridge rather than by container name — and ufw's default-deny drops that
 # silently. The socket is bound and listening; the packets never arrive. Any
 # future host-networked exporter needs the same one-line exception.
-sudo ufw allow in on br-glass to 100.94.219.53 port 9100 proto tcp \
-  comment 'prometheus -> node_exporter' >/dev/null
+# Scoped by source subnet, not by interface: Prometheus is on both `glass` and
+# `edge`, and Docker picks one of them for its default route, so an interface
+# rule matches whichever bridge it did not choose. 172.16/12 is Docker's whole
+# default address pool.
+sudo ufw --force delete allow in on br-glass to 100.94.219.53 port 9100 proto tcp \
+  >/dev/null 2>&1 || true
+sudo ufw allow from 172.16.0.0/12 to 100.94.219.53 port 9100 proto tcp \
+  comment 'docker -> node_exporter' >/dev/null
 
 docker compose -f "$STACK" up -d
 # Bind mounts don't trigger a recreate, so a changed prometheus.yml or
