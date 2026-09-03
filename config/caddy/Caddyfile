@@ -17,11 +17,6 @@
 		propagation_timeout 10m
 	}
 
-	@whoami host whoami.lab.akhildhyani.me
-	handle @whoami {
-		reverse_proxy whoami:80
-	}
-
 	@grafana host grafana.lab.akhildhyani.me
 	handle @grafana {
 		reverse_proxy grafana:3000

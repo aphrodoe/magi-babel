@@ -19,14 +19,6 @@ services:
       - caddy_config:/config
     networks: [edge]
 
-  # Throwaway proof-of-life: echoes the request back. Delete once a real
-  # service is behind the proxy.
-  whoami:
-    image: traefik/whoami
-    container_name: whoami
-    restart: unless-stopped
-    networks: [edge]
-
 networks:
   edge:
     name: edge

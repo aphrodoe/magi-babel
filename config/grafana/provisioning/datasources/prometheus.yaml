@@ -2,6 +2,9 @@ apiVersion: 1
 
 datasources:
   - name: Prometheus
+    # Fixed, because dashboards in dashboards/ reference it by uid. Let
+    # Grafana generate one and every provisioned dashboard breaks on rebuild.
+    uid: prometheus
     type: prometheus
     access: proxy
     # Container name on the `glass` network — Grafana reaches Prometheus
