@@ -25,6 +25,13 @@ if [ ! -f "$ENVF" ] || [ "${1:-}" = --reset ]; then
   unset PASS
 fi
 
+# node_exporter is in the host namespace, so Prometheus reaches it over the
+# bridge rather than by container name — and ufw's default-deny drops that
+# silently. The socket is bound and listening; the packets never arrive. Any
+# future host-networked exporter needs the same one-line exception.
+sudo ufw allow in on br-glass to 100.94.219.53 port 9100 proto tcp \
+  comment 'prometheus -> node_exporter' >/dev/null
+
 docker compose -f "$STACK" up -d
 # Bind mounts don't trigger a recreate, so a changed prometheus.yml or
 # provisioning file needs this to take effect (same reason as 50-mqtt.sh).

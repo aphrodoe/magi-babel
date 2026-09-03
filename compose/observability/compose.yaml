@@ -80,6 +80,12 @@ networks:
   # Prometheus, cAdvisor and Grafana talk to each other here and nowhere else.
   glass:
     name: glass
+    driver_opts:
+      # Pin the bridge's interface name. Docker otherwise derives it from the
+      # network ID (br-86d4199...), which changes on every recreate — and the
+      # ufw rule in 60-observability.sh has to name an interface that will
+      # still be called that after the Proxmox rebuild.
+      com.docker.network.bridge.name: br-glass
   # Caddy's network, defined in compose/caddy. Only Prometheus and Grafana join
   # it — cAdvisor has no business being reachable from the proxy.
   edge:
