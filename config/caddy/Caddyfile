@@ -29,6 +29,11 @@
 		reverse_proxy prometheus:9090
 	}
 
+	@status host status.lab.akhildhyani.me
+	handle @status {
+		reverse_proxy uptime-kuma:3001
+	}
+
 	# Anything under the wildcard with nothing behind it. Without this Caddy
 	# would serve an empty 200 and you'd waste an hour wondering which layer
 	# ate the request.

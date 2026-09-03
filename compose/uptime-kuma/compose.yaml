@@ -1,0 +1,20 @@
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:2
+    container_name: uptime-kuma
+    restart: unless-stopped
+    volumes:
+      - uptime_kuma:/app/data
+    # `edge` so Caddy can serve it and so it can probe the public hostnames;
+    # `bus` so it can open a TCP check against mosquitto:1883 without going
+    # back out through the host and into ufw.
+    networks: [edge, bus]
+
+networks:
+  edge:
+    external: true
+  bus:
+    external: true
+
+volumes:
+  uptime_kuma:
