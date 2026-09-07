@@ -9,8 +9,24 @@
 # database is a setting the rebuild loses.
 #
 # No 1.1.1.1 anywhere, per CLAUDE.md — on campus wifi that address is the DHCP
-# server, not Cloudflare. Upstream is Quad9 over DoH on 443, which also means
-# the campus network cannot read or tamper with the queries.
+# server, not Cloudflare.
+#
+# UPSTREAMS ARE MEASURED, NOT CHOSEN. Tested from MAGI on 2026-09-07, because
+# the first attempt (Quad9 DoH) silently timed out every query for 30 s:
+#
+#   DoH  dns.quad9.net / dns.google / cloudflare-dns.com   BLOCKED
+#   DoH  dns.adguard-dns.com                               works
+#   DoT  9.9.9.9:853                                       times out
+#   DoT  dns.google:853                                    works
+#   UDP  53 to 9.9.9.9 / 8.8.8.8                           works
+#
+# The campus filters by *provider*, not by protocol — Google's DoT is fine
+# while Quad9's is not, on the same port. Re-test with scripts/magi/diag-dns.sh
+# if resolution ever stops; the policy is someone else's and can change.
+#
+# Note TCP/853 to Quad9 *accepts the connection* and then never completes the
+# handshake, so a port check calls it open. An open port is not a working
+# service — the same lesson as node_network_up calling tailscale0 down.
 http:
   pprof:
     port: 6060
@@ -43,14 +59,21 @@ dns:
   ratelimit_whitelist: []
   refuse_any: true
   upstream_dns:
-    - https://dns.quad9.net/dns-query
+    - tls://dns.google
+    - https://dns.adguard-dns.com/dns-query
   upstream_dns_file: ""
   bootstrap_dns:
     - 9.9.9.9
     - 149.112.112.112
     - 2620:fe::fe
     - 2620:fe::9
-  fallback_dns: []
+  # Plaintext, and used only if both encrypted upstreams above stop working.
+  # A silent downgrade to cleartext is a real privacy loss, but this box serves
+  # DNS for the whole tailnet and total resolution failure is worse. The query
+  # log shows which upstream answered.
+  fallback_dns:
+    - 9.9.9.9
+    - 8.8.8.8
   upstream_mode: load_balance
   fastest_timeout: 1s
   allowed_clients: []
