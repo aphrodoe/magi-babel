@@ -19,6 +19,7 @@ reloaded, a DNS delegation that lapsed.
 | Loki | HTTP(s) | `http://loki:3100/ready` | no public hostname by design; reached over `glass` |
 | Authelia | HTTP(s) | `https://auth.lab.akhildhyani.me/api/health` | returns 200; the front door for everything with no auth of its own |
 | AdGuard | **DNS** | resolve `example.com` via `100.94.219.53` | **Not an HTTP check.** See below |
+| AdGuard blocking | **DNS** | resolve `doubleclick.net` via `100.94.219.53` | Condition: record **equals `0.0.0.0`**. Without the condition it passes on a real answer, which is the state you want to catch |
 | Radicale | HTTP(s) | `https://dav.lab.akhildhyani.me/` | redirects to `/.web`; accept 200 |
 | Wall port | HTTP(s) | `https://connectivity-check.ubuntu.com` | catches the captive portal expiring. **Not 1.1.1.1** — on campus wifi that address is the DHCP server, not Cloudflare (CLAUDE.md) |
 
@@ -32,6 +33,16 @@ service exists to do.
 The same failure also left AdGuard with **no blocklist at all**: it could not
 resolve the URL its filter list downloads from. A broken resolver is
 self-compounding, and nothing about the UI says so.
+
+**Two monitors, because resolving and blocking fail separately.** The
+`example.com` row catches a dead upstream. It cannot catch a missing blocklist —
+that name resolves perfectly either way. The `doubleclick.net` row catches the
+second failure, but only because of the condition on `0.0.0.0`; a DNS monitor
+with no condition passes on *any* answer, including the real ad-server address.
+
+Leave **Domain Name Expiry Notification off** on both. On a DNS monitor it
+watches the registration expiry of the name being queried — `example.com`
+belongs to IANA, and `doubleclick.net` to Google. Neither is yours to renew.
 
 Interval 60 s, retries 2. Anything tighter just fills Loki with probe noise.
 
