@@ -35,12 +35,22 @@ AGUSER="$(sudo sed -n 1p "$HASHF")"
 
 # Rendered with awk rather than sed: a bcrypt hash contains '/' and '$', which
 # sed would treat as a delimiter and as backreferences respectively.
+#
+# Whole lines are REPLACED, not substrings substituted. The first version
+# matched "^    name: admin$" against a line that is actually "  - name: admin"
+# — two spaces and a dash, because it is the first item of a YAML list. It
+# silently did nothing, the username stayed `admin`, and the only symptom was a
+# 403 at the login page that looked exactly like a mistyped password.
 sudo awk -v u="$AGUSER" -v h="$(sudo sed -n 2p "$HASHF")" '
-  { if ($0 ~ /__ADGUARD_PASSWORD_HASH__/) {
-      sub(/__ADGUARD_PASSWORD_HASH__/, h)
-    }
-    if ($0 ~ /^    name: admin$/) { sub(/admin$/, u) }
-    print }' "$SRC" | sudo tee "$DST" >/dev/null
+  /^  - name: /     { print "  - name: " u; next }
+  /^    password: / { print "    password: " h; next }
+                    { print }' "$SRC" | sudo tee "$DST" >/dev/null
+
+# Fail loudly rather than serving a config with the placeholder still in it.
+sudo grep -q '__ADGUARD_PASSWORD_HASH__' "$DST" \
+  && { echo "render failed: placeholder still present in $DST" >&2; exit 1; }
+sudo grep -q "^  - name: $AGUSER\$" "$DST" \
+  || { echo "render failed: username not applied in $DST" >&2; exit 1; }
 sudo chmod 600 "$DST"
 
 docker compose -f "$STACK" up -d
