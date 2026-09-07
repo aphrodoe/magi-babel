@@ -341,8 +341,15 @@ two, one order instead of two. The ₹649 TFT was already sitting in the H-01→
 recording: the prototype's whole job is to reveal the layout before the ₹7,000–9,000 e-paper
 is bought, and that discovery is now a phase further away.
 
-### H-04 — THE HOUSE · ₹0
+### H-04 — THE HOUSE · ₹5,500–7,000
 The services that make people say *"wait, you're not paying for that?"*
+
+**This phase is not free, and calling it ₹0 hid the one purchase that matters.**
+Immich, Vaultwarden and Paperless are the first services whose loss actually costs
+you something, so **R3 stops being aspirational here** — that is the 2 TB external
+HDD, ₹5,500–7,000. **HDD, not SSD:** `restic` writes sequentially, overnight,
+unattended, so SSD latency buys nothing, and under the NAND shortage the SSD is
+₹10–18k against ~₹7k for twice the capacity.
 
 | Service | Replaces | Why it earns its slot |
 |---|---|---|

@@ -41,7 +41,7 @@ forward: the 2 × 8 GB DDR4-3200 upgrade, which blocks H-08 and nothing before i
 | ✅ | **H-01** | The Spine — Docker, Tailscale, Caddy, wildcard TLS | ₹0 |
 | ✅ | **H-02** | The Nervous System — Mosquitto, the MQTT topic tree | ₹0 |
 | ⬜ | **H-03** | The Glass — Prometheus, Grafana, Loki, Uptime Kuma | ₹0 |
-| ⬜ | **H-04** | The House — Jellyfin, Immich, Vaultwarden, Paperless | ₹0 |
+| ⬜ | **H-04** | The House — Jellyfin, Immich, Vaultwarden, Paperless | ₹5.5–7k |
 | ⬜ | **H-05** | Ambient Telemetry — ESP32-S3, LED strip, wall panel | ₹2.2–3.2k |
 | ⬜ | **H-06** | The Sky Log — RTL-SDR, ADS-B, weather satellites | ₹4.8–5.5k |
 | ⬜ | **H-07** | The Range — Suricata, Juice Shop, the security lab | ₹0 |
