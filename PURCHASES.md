@@ -121,7 +121,7 @@ scissors job.
 
 | Item | ₹ | Buy when |
 |---|--:|---|
-| 2 × 8 GB DDR4-3200, matched pair | 12,000+ | **H-08.** Nothing before it needs the bandwidth. Shortage; expect to pay more later, not less. Buy a *matched pair* — one 16 GB stick is single channel and halves the Oracle's token rate. |
+| 2 × 8 GB DDR4-3200, matched pair | 12,000+ | **H-04 if you want Immich's ML, otherwise H-08.** Re-dated 2026-09-07: Immich v3 documents 6 GB minimum / 8 GB recommended, against 6.93 GiB total here (the Iris Xe reserves ~1 GiB of the 8), already carrying ~800 MB of H-03. 4 GB works only with machine learning off, which costs face and semantic search. H-08 still needs the bandwidth regardless. Shortage; expect to pay more later, not less. Buy a *matched pair* — one 16 GB stick is single channel and halves the Oracle's token rate. |
 | Pi 5 16 GB + Raspberry Pi AI HAT+ 2 | ~30,000 | **Only if H-08's measured prefill on MAGI is too slow** — see MASTERPLAN §H-08. The silicon is fine; the model zoo is the constraint. HAT alone is ₹13,989 at Hubtronics, out of stock 2 Sep 2026. Doubles as an H-10 node. |
 | 7.5″ e-paper 800×480 + driver | 7,000–9,000 | Once the SPI TFT prototype has told you which six numbers belong on a wall. |
 | Gigabit switch + Cat6 | 1,500–2,300 | **H-10**, second machine. One wall port, one machine, until then. |

@@ -360,9 +360,69 @@ unattended, so SSD latency buys nothing, and under the NAND shortage the SSD is
 | **Paperless-ngx** | a drawer | OCR'd, searchable documents |
 | **Navidrome** | Spotify | Subsonic clients everywhere |
 | **Syncthing** | Dropbox | Peer-to-peer, no cloud |
+| **Radicale** | Google Calendar + Contacts | CalDAV/CardDAV. ~20 MB, file-backed, no database |
 | **Authelia** | — | **SSO across all of it.** One login. This is the pro move. |
+| **restic + timer** | — | **The phase's actual point.** Everything above is only as real as this |
 
 Immich and Authelia are missing from the brainstorm and both belong in the top five.
+
+**Settled 2026-09-07 — audited against live sources before building.** Six of the
+original eight survived unchanged. Four things did not.
+
+**The list had no backup job in it.** R3 says backups are a plan, `TOPICS.md` already
+reserves `magi/backup/{state,pct}` and H-05 has a `BACKUP` LED state — but nothing in
+this phase actually ran `restic`. The HDD is hardware; the job is software, and it was
+missing. It is a **systemd timer on the host** running `restic` against the Docker
+volumes, not a container with a scheduler inside it: that keeps scheduling in
+`journalctl` with the rest of the lab, survives an image upgrade, and orders the
+Postgres dumps before the snapshot. `restic` over `borg` because the offsite copy in
+R3's 3-2-1 is object storage, which borg cannot address natively.
+
+**Radicale, not Baïkal.** Baïkal has the nicer setup wizard, and that is exactly the
+problem — users and calendars live in a web UI and a database. Radicale is ~20 MB of
+Python over plain files on disk, which R2 can regenerate and git can hold. Same
+argument that picked Authelia over Authentik: **the config being a file is the feature.**
+
+**Navidrome stays, and the reason is stronger than assumed.** Jellyfin's Subsonic
+support is a *community plugin* — partial, separately maintained, outside the core
+release cycle. Navidrome speaks OpenSubsonic natively, which is what the ~20 mature
+clients target, and idles around 50 MB. It is not a duplicate of Jellyfin; it is the
+music client ecosystem Jellyfin does not have.
+
+**Immich now wants more RAM than MAGI has.** Since v3 (July 2026) the documented
+requirement is **6 GB minimum, 8 GB recommended** — against 6.93 GiB total on this box,
+already carrying ~800 MB of H-03. Immich's own docs say 4 GB works *only with machine
+learning disabled*, which costs the face and semantic search that make it worth running.
+So H-08 is no longer the only trigger for the RAM: see §09. v3 also requires
+**x86-64-v2** for the ML container on amd64 — the i5-1235U is Alder Lake and fine, but a
+Proxmox rebuild under R2 must not expose an older virtual CPU profile.
+
+**Three things that will bite, all of them silent.**
+
+1. **Vaultwarden behind Authelia breaks every app you own.** The browser extension and
+   the mobile clients talk to `/api`, `/identity` and `/notifications` and cannot follow
+   a forward-auth redirect — they do not fail loudly, they just stop syncing. Those three
+   prefixes need `policy: bypass` in `access_control`, with `/admin` still behind
+   `one_factor`. Vaultwarden's own login is doing the real work; Authelia is guarding the
+   admin panel and the web vault. **Pin a current version and watch releases** — 2026 has
+   already produced an auth-bypass (CVE-2026-43912), a collection-permission bypass fixed
+   in 1.35.3 (CVE-2026-26012) and a 2FA bypass (CVE-2026-27801). This is the one service
+   where "I'll update it later" is a real decision.
+
+2. **AdGuard Home blocks nothing until the tailnet points at it.** It is a resolver — a
+   phone on campus wifi uses DHCP-supplied servers and never asks MAGI. The deployment is
+   Tailscale admin → DNS → **global nameserver `100.94.219.53`, with Override local DNS
+   on**, which gets every device filtered on any network, anywhere. The trap: MAGI itself
+   must run `tailscale up --accept-dns=false`, or the DNS server resolves through itself
+   and loops. Second trap: once Override is on, **MAGI becoming unreachable takes DNS down
+   for every device on the tailnet** — R3's "the machine can die" now has an audience.
+
+3. **DNS filtering cannot block YouTube ads, and never will.** It decides whether to
+   answer a query for a domain; YouTube serves ads from the same domains and the same
+   streams as the video. Blocking those breaks playback. The same is true of in-app ads
+   on Instagram and most mobile apps, and apps with hardcoded DoH resolvers skip your
+   server entirely. What AdGuard *does* block is the separate tracking and telemetry
+   domains, which is a lot — just not the thing everyone tests it with first.
 
 ### H-05 — AMBIENT TELEMETRY · ₹2,150–3,150
 ESP32-S3 (owned) + WS2812B strip + a proper 5 V supply. **WLED** for the easy
