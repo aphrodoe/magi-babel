@@ -9,14 +9,19 @@ rather than assuming; don't restate it back into this file.**
 
 ## Where I am right now
 
-- **Phase: H-03 (the glass).** H-02 closed 2026-09-03. Mosquitto is up with auth and
-  ACLs on its own `bus` network; `magi-sys.service` publishes `magi/sys/*` and
-  `magi/svc/*`. **`config/mosquitto/TOPICS.md` is the naming rule for everything that
+- **Phase: H-04 (the house).** H-03 closed 2026-09-07 on software: Prometheus,
+  node_exporter, cAdvisor, Grafana, Loki + Alloy and Uptime Kuma are up and provisioned
+  from files. `dashboards/READING.md` says what the panels mean and which four readings
+  look like faults but aren't. **The wall panel moved to H-05** — it hangs off the same
+  ESP32-S3 as the LED strip, so it is one wiring session. **H-04 is not free: buy the
+  2 TB HDD first**, because Immich and Vaultwarden are the first services whose loss
+  costs something. H-02 before it put Mosquitto up with auth and ACLs on its own `bus`
+  network; `magi-sys.service` publishes `magi/sys/*` and `magi/svc/*`, retained and with
+  an LWT. **`config/mosquitto/TOPICS.md` is the naming rule for everything that
   follows — read it before adding any publisher.** Caddy serves `*.lab.akhildhyani.me`
   on a Let's Encrypt wildcard, DNS-01 via **deSEC**, which holds `lab.` alone by an NS
   record at Namecheap; apex, Vercel and email never moved. Adding a service is a compose
-  block plus three lines of Caddyfile — no DNS record, no cert, no port. `whoami` is
-  scaffolding and goes when Grafana lands.
+  block plus three lines of Caddyfile — no DNS record, no cert, no port.
 - **MAGI:** HP 15s-fq5xxx, i5-1235U (10c/12t, Iris Xe), 2 × 4 GB DDR4-3200 with **both
   slots full** (32 GB ceiling), 512 GB NVMe, **no Ethernet port**. Ubuntu Server 26.04.1
   LTS, LVM no LUKS, root 466 G. Hardened by `scripts/magi/20-harden.sh`.

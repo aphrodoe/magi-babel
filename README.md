@@ -23,15 +23,20 @@ Prices re-checked 30 Aug 2026 against the DRAM/NAND shortage.
 
 ## Progress
 
-**Phase H-03 · the glass.** H-02 is done: Mosquitto is up with auth and ACLs, and the
-topic schema was settled on paper before anything published — every service from here on
-is a publisher or a subscriber to it. H-01 before it put Docker and Caddy up, so
-`https://*.lab.akhildhyani.me` resolves over the tailnet with a Let's Encrypt wildcard
-cert issued over DNS-01 — no port open on the campus network, and adding a service is a
-compose block plus three lines of Caddyfile. Underneath it, MAGI runs Ubuntu Server
-26.04.1, boots in 14 s, logs itself into the campus captive portal, keeps WPA2-Enterprise
-wifi as a fallback, and answers only on the tailnet. **One H-00 item is still carried
-forward: the 2 × 8 GB DDR4-3200 upgrade, which blocks H-08 and nothing before it.**
+**Phase H-04 · the house.** H-03 is done: the lab can now see itself. Prometheus,
+node_exporter and cAdvisor collect, Loki and Alloy take the logs that never reach
+`docker logs` — the captive-portal retries and the slow WPA2-Enterprise association —
+Grafana draws it from provisioned files, and Uptime Kuma probes the *public* hostnames
+so it fails on a dead cert, not just a dead container. `dashboards/READING.md` records
+what the panels mean and the four readings that look like faults and aren't. The wall
+panel moved to H-05, where it shares a wiring session with the LED strip. Before it,
+H-02 put Mosquitto up with auth, ACLs and a topic schema settled on paper, and H-01 put
+Docker and Caddy up, so `https://*.lab.akhildhyani.me` resolves over the tailnet with a
+Let's Encrypt wildcard issued over DNS-01 — no port open on the campus network.
+Underneath, MAGI runs Ubuntu Server 26.04.1, boots in 14 s, logs itself into the campus
+captive portal, keeps wifi as a fallback, and answers only on the tailnet. **Two things
+carried: the 2 TB backup HDD, which H-04 now needs before Immich and Vaultwarden hold
+anything you would miss, and the 2 × 8 GB DDR4-3200 upgrade, which blocks H-08 alone.**
 
 ### MAGI — the homelab
 
@@ -40,7 +45,7 @@ forward: the 2 × 8 GB DDR4-3200 upgrade, which blocks H-08 and nothing before i
 | ✅ | **H-00** | Groundwork — install, network, hardening, `git init` · *RAM upgrade still to buy* | ₹0–4k |
 | ✅ | **H-01** | The Spine — Docker, Tailscale, Caddy, wildcard TLS | ₹0 |
 | ✅ | **H-02** | The Nervous System — Mosquitto, the MQTT topic tree | ₹0 |
-| ⬜ | **H-03** | The Glass — Prometheus, Grafana, Loki, Uptime Kuma | ₹0 |
+| ✅ | **H-03** | The Glass — Prometheus, Grafana, Loki, Uptime Kuma | ₹0 |
 | ⬜ | **H-04** | The House — Jellyfin, Immich, Vaultwarden, Paperless | ₹5.5–7k |
 | ⬜ | **H-05** | Ambient Telemetry — ESP32-S3, LED strip, wall panel | ₹2.2–3.2k |
 | ⬜ | **H-06** | The Sky Log — RTL-SDR, ADS-B, weather satellites | ₹4.8–5.5k |
