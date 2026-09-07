@@ -361,6 +361,7 @@ unattended, so SSD latency buys nothing, and under the NAND shortage the SSD is
 | **Navidrome** | Spotify | Subsonic clients everywhere |
 | **Syncthing** | Dropbox | Peer-to-peer, no cloud |
 | **Radicale** | Google Calendar + Contacts | CalDAV/CardDAV. ~20 MB, file-backed, no database |
+| **Karakeep** | Pocket, browser bookmarks | Links, notes, PDFs, full-text searchable — **and it tags them with your own Ollama in H-08** |
 | **Authelia** | — | **SSO across all of it.** One login. This is the pro move. |
 | **restic + timer** | — | **The phase's actual point.** Everything above is only as real as this |
 
@@ -388,6 +389,14 @@ support is a *community plugin* — partial, separately maintained, outside the 
 release cycle. Navidrome speaks OpenSubsonic natively, which is what the ~20 mature
 clients target, and idles around 50 MB. It is not a duplicate of Jellyfin; it is the
 music client ecosystem Jellyfin does not have.
+
+**Karakeep is the one addition that isn't a replacement.** It saves links, notes,
+images and PDFs and makes them full-text searchable — but the reason it belongs *here*
+rather than on a list of nice-to-haves is that it can point at a local LLM for automatic
+tagging and summarising. That is **H-08's Oracle with a real job on day one**, instead of
+a model you talk to and then forget. Build it in H-04, wire it to Ollama in H-08. Cost:
+it archives pages with a headless browser, so it is heavier than its description
+suggests — see the RAM note below before adding it *and* Immich in the same week.
 
 **Immich now wants more RAM than MAGI has.** Since v3 (July 2026) the documented
 requirement is **6 GB minimum, 8 GB recommended** — against 6.93 GiB total on this box,
@@ -417,7 +426,17 @@ Proxmox rebuild under R2 must not expose an older virtual CPU profile.
    and loops. Second trap: once Override is on, **MAGI becoming unreachable takes DNS down
    for every device on the tailnet** — R3's "the machine can die" now has an audience.
 
-3. **DNS filtering cannot block YouTube ads, and never will.** It decides whether to
+3. **AdGuard is not an ad solution here, and cannot replace WARP.** Recorded 2026-09-07,
+   because the row above oversells it for *this* setup: Brave and ReVanced already handle
+   ads on the devices that matter, so AdGuard's remaining value is **telemetry blocking,
+   query visibility, and DoH upstream** — seeing what a phone talks to overnight is the
+   "DNS teacher" part, and it is the honest reason to run it. It also **cannot escape
+   campus restrictions**: it answers name→IP, so if the block is by IP, SNI or DPI the
+   correct answer still leads somewhere blocked, and an exit node through MAGI is *on*
+   the campus network anyway. WARP is a tunnel; this is a phone book. Keep it, but build
+   it after `restic`.
+
+4. **DNS filtering cannot block YouTube ads, and never will.** It decides whether to
    answer a query for a domain; YouTube serves ads from the same domains and the same
    streams as the video. Blocking those breaks playback. The same is true of in-app ads
    on Instagram and most mobile apps, and apps with hardcoded DoH resolvers skip your
