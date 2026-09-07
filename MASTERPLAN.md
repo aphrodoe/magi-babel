@@ -290,7 +290,9 @@ instead of twelve.
 
 ### H-03 — THE GLASS · ₹0
 Prometheus + node_exporter + cAdvisor + Grafana + Loki/Promtail + Uptime Kuma.
-Then the physical layer: something on the wall, always on.
+Then the physical layer: something on the wall, always on. **The panel moved to H-05 on
+2026-09-07 — see the note closing this section. Everything below it stands as the panel's
+design brief; only the phase it gets built in changed.**
 
 > **Answer one question before buying a panel: ambient status, or an interactive
 > dashboard?** They're different products and the answer changes the hardware
@@ -355,7 +357,7 @@ The services that make people say *"wait, you're not paying for that?"*
 
 Immich and Authelia are missing from the brainstorm and both belong in the top five.
 
-### H-05 — AMBIENT TELEMETRY · ₹1,500–2,500
+### H-05 — AMBIENT TELEMETRY · ₹2,150–3,150
 ESP32-S3 (owned) + WS2812B strip + a proper 5 V supply. **WLED** for the easy
 audio-reactive path; a small custom firmware for the MQTT state machine.
 
@@ -1182,7 +1184,7 @@ is rarely the cheapest route — and a phone was never the best answer for this 
 
 | Option | ₹ | Trade | Verdict |
 |---|---|---|---|
-| **ESP32-S3 + 2.8–3.5″ SPI display** | ~800 | Six values, big type. Same board already driving the LEDs and already on MQTT. | **START HERE.** Nearly free, and teaches you what you actually want to see before you spend. |
+| **ESP32-S3 + 2.4–3.5″ SPI display** | 649 live | Six values, big type. Same board already driving the LEDs and already on MQTT. | **START HERE — in H-05**, not H-03; it is one wiring session with the strip. Nearly free, and teaches you what you actually want to see before you spend. |
 | **Waveshare 7.5″ e-Paper HAT + Pi Zero 2 W** (800×480) | 7,000–9,000 | No backlight, ~zero power between refreshes, readable across the room. Refresh takes seconds; no colour, no touch. | **THE RIGHT ANSWER.** The standard for Pi dashboard builds, and it matches §00's legibility rule better than any screen. In a dorm the no-backlight part is a real win at night. |
 | **Inkplate 5 / 6** | 8,000–13,000 | All-in-one — ESP32 in the panel, wifi, 0.19 s partial refresh. No Pi needed. | **Simpler, pricier.** Fewer parts, nicer object. Imported — factor shipping and time. |
 | **Used Android tablet** | 3,000–6,000 | Full colour, touch, live-updating, Fully Kiosk against real Grafana. | **If you want interactive.** Cheapest route to the whole dashboard. Accept that it glows all night. |
@@ -1190,7 +1192,7 @@ is rarely the cheapest route — and a phone was never the best answer for this 
 | **Dead laptop screen + driver board** | 1,500–2,500 | If you have a dead laptop, its panel is probably fine — a ₹2,000 LVDS/eDP board gives it HDMI. | **Excellent salvage.** A big screen for almost nothing, deeply in the spirit of both projects. |
 | Repair the phone | 3,000–6,000 | Two repairs. | **SKIP** unless both quotes together land under ~₹2,500. |
 
-**My call: ₹800 SPI display in month three, 7.5″ e-paper in month eight.** Ambient
+**My call: ₹649 SPI display in H-05, 7.5″ e-paper in month eight.** Ambient
 status is what the room needs — a thing you glance at, not a thing you operate.
 Grafana on your laptop covers everything the panel deliberately won't, and a wall
 that doesn't glow is a wall you'll keep.

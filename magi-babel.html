@@ -637,7 +637,7 @@ magi/light/cmd                 the only write topic</code></pre>
 
   <div class="phase">
     <div class="phase-h"><span class="id">H-03</span><span class="ti">The Glass</span><span class="cost">₹0</span></div>
-    <p>Prometheus + node_exporter + cAdvisor + Grafana + Loki/Promtail + Uptime Kuma. Then the physical layer: something on the wall, always on.</p>
+    <p>Prometheus + node_exporter + cAdvisor + Grafana + Loki/Promtail + Uptime Kuma. Then the physical layer: something on the wall, always on — <strong>the panel moved to H-05 on 7 Sep 2026; see the note closing this phase. Everything below stands as its design brief.</strong></p>
     <p>Resist putting Grafana on it. Build <strong>one custom status page</strong> — six things, huge type, readable across the room: services up/down, CPU + temp, ADS-B count, next satellite pass, last backup, deck status. Grafana lives one tap away for when you're actually debugging.</p>
 
     <div class="card hi">
@@ -647,7 +647,7 @@ magi/light/cmd                 the only write topic</code></pre>
 
     <p><strong>Start with what you already own.</strong> The ESP32-S3 driving the LED strip in H-05 is <em>already</em> an MQTT subscriber. Add a ₹800 SPI colour display to that same board and you have a working status panel for the price of lunch — and you'll learn what you actually want to look at before spending real money.</p>
     <p>Then upgrade deliberately. Full options and verdicts in <a href="#dossier">§06 D-7</a>; the short version is that a <strong>7.5″ e-paper panel</strong> is the aesthetic and practical winner for ambient status, and a <strong>used Android tablet</strong> is the right answer if you decide you want the whole Grafana dashboard and touch.</p>
-    <div class="buy"><span class="k">Needs</span><span class="v">2.4–2.8″ SPI TFT now · 7.5″ e-paper later</span><span class="p">₹600–1,200 now · ₹7,000–9,000 later · ESP32-S3 only</span></div>
+    <div class="buy"><span class="k">Needs</span><span class="v">2.4″ SPI TFT — <em>bought in H-05</em> · 7.5″ e-paper later</span><span class="p">₹649 in H-05 · ₹7,000–9,000 later · ESP32-S3 owned</span></div>
     <div class="plain"><span class="plabel">In plain English</span>
       <p><b>E-paper</b> (e-ink) is the screen technology in a Kindle. It holds an image with <em>no power at all</em> — electricity is only used to change what's shown. So a wall panel refreshing every minute draws almost nothing, and it's lit by the room rather than lighting the room.</p>
       <p>That last part matters more than it sounds in a dorm. A tablet glowing on your wall all night is genuinely annoying to sleep next to. E-paper just sits there like a printed sheet that happens to be correct.</p>
@@ -663,6 +663,14 @@ magi/light/cmd                 the only write topic</code></pre>
         <li>PromQL: work through the query examples in the Prometheus docs by hand</li>
       </ul>
       <div class="proof"><b>Proof</b>Write a PromQL query that answers a question you actually have — "what was my 95th-percentile CPU last week?" — and explain why a percentile beats an average here.</div>
+    </div>
+
+    <div class="card crit">
+      <span class="lbl">Settled 7 Sep 2026 — the panel moves to H-05, H-03 closes on software</span>
+      <p>Two things only became visible once the stack was actually running.</p>
+      <p><strong>Four of the six numbers do not exist yet.</strong> ADS-B is H-06/H-07, the satellite pass is H-07, last-backup is R3 and deck status is CD-*. A panel built now shows two of six and filler.</p>
+      <p><strong>The display hangs off the same ESP32-S3 that H-05 mounts, powers and wires for the strip.</strong> Building it first means taping a board to a desk and rewiring it a phase later — one wiring session instead of two, one order instead of two.</p>
+      <p>The argument <em>against</em> waiting is real and worth recording: the prototype's whole job is to reveal the layout before the ₹7,000–9,000 e-paper is bought, and that discovery is now a phase further away.</p>
     </div>
   </div>
 
@@ -690,8 +698,9 @@ magi/light/cmd                 the only write topic</code></pre>
   </div>
 
   <div class="phase">
-    <div class="phase-h"><span class="id">H-05</span><span class="ti">Ambient Telemetry</span><span class="cost">₹1,500–2,500</span></div>
+    <div class="phase-h"><span class="id">H-05</span><span class="ti">Ambient Telemetry</span><span class="cost">₹2,150–3,150</span></div>
     <p>Your ESP32-S3 + a WS2812B strip + a proper 5 V supply. WLED for the easy audio-reactive path; small custom firmware for the MQTT state machine.</p>
+    <p><strong>The wall panel lands here too</strong> (deferred from H-03): the ₹649 2.4″ SPI TFT hangs off this same board on the same MQTT subscription, so it is one wiring session with the strip.</p>
     <p><strong>Every state means something.</strong> Write this table before you write firmware:</p>
     <div class="tbl-w"><table>
       <thead><tr><th>State</th><th>Trigger</th><th>Behaviour</th></tr></thead>
@@ -1667,7 +1676,7 @@ magi/light/cmd                 the only write topic</code></pre>
     <tbody>
       <tr><td><strong>Tools</strong></td><td>Tips, solder, flux, multimeter, logic analyser — iron owned</td><td class="num">1,000–2,800</td></tr>
       <tr><td><strong>H-00 → H-04</strong></td><td>RAM, 1 TB SSD, switch, domain. Private cloud, media, photos, dashboards, SSO.</td><td class="num">9,300–13,800</td></tr>
-      <tr><td><strong>H-03 panel</strong></td><td>ESP32 SPI display now, 7.5″ e-paper later (D-7)</td><td class="num">800–9,000</td></tr>
+      <tr><td><strong>H-05 panel</strong></td><td>ESP32 SPI display in H-05, 7.5″ e-paper later (D-7)</td><td class="num">649–9,000</td></tr>
       <tr><td><strong>H-05 → H-06</strong></td><td>LEDs + PSU, RTL-SDR V3, LNA. Reactive lighting, aircraft map, satellite images.</td><td class="num">7,800–10,500</td></tr>
       <tr><td><strong>CD-00 → CD-02</strong></td><td>SBC, NVMe, display, keyboard, battery, case. Babel-2588 v1.</td><td class="num">21,000–45,000</td></tr>
       <tr><td><strong>CD-03 → CD-04</strong></td><td>Meter, switches, labels, module bay. <em>Highest joy per rupee in the program.</em></td><td class="num">4,500–8,000</td></tr>
