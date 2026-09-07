@@ -106,5 +106,13 @@ Re-check each at its phase — this layer moves.
   the topic names are one scheme; that is the point of the callsigns.
 - **The ACL file is written against this shape**, so restructuring later means
   rewriting permissions, not just renaming topics.
-- **Prometheus does not speak MQTT.** Graphing any of this in H-03 needs a bridge
-  (`mqtt2prometheus`) pointed at the branches worth keeping as time series.
+- **Prometheus does not speak MQTT — and does not need to.** This said H-03 would need
+  an `mqtt2prometheus` bridge. Checked 2026-09-07, once H-03 was actually up: node_exporter
+  already publishes everything under `magi/sys/` at higher resolution — `node_hwmon_temp_celsius`
+  (16 sensors against this tree's one), `node_power_supply_capacity`, `node_power_supply_online`,
+  and CPU, mem, disk, load and uptime besides. A bridge would duplicate it and add a moving part.
+  **The two are parallel consumers of the same machine, not a pipeline**: Prometheus feeds
+  Grafana, this tree feeds the panel and the LED strip. Revisit only when something publishes
+  here that is *not* derived from the host — a real sensor, the deck, a mesh node. The one
+  thing genuinely absent from Prometheus is the `degraded` semantic, and Uptime Kuma already
+  answers the up/down question that matters.

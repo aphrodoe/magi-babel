@@ -328,6 +328,17 @@ you actually need to debug.
 
 The wall panel is the thing guests see. Design it like a product, not a dashboard.
 
+**Settled 2026-09-07 — the panel moves to H-05, and H-03 closes on software.** Two things
+only became visible once the stack was actually running. **Four of the six numbers do not
+exist yet**: ADS-B is H-06/H-07, the satellite pass is H-07, last-backup is R3 and deck
+status is CD-\*. A panel built now would show two of six and filler. And **the display hangs
+off the same ESP32-S3 that H-05 mounts, powers and wires for the strip** — building it first
+means taping a board to a desk, then rewiring it a phase later. One wiring session instead of
+two, one order instead of two. The ₹649 TFT was already sitting in the H-01→H-05 block of
+`PURCHASES.md`, so nothing moves there. The argument *against* waiting is real and worth
+recording: the prototype's whole job is to reveal the layout before the ₹7,000–9,000 e-paper
+is bought, and that discovery is now a phase further away.
+
 ### H-04 — THE HOUSE · ₹0
 The services that make people say *"wait, you're not paying for that?"*
 
@@ -347,6 +358,10 @@ Immich and Authelia are missing from the brainstorm and both belong in the top f
 ### H-05 — AMBIENT TELEMETRY · ₹1,500–2,500
 ESP32-S3 (owned) + WS2812B strip + a proper 5 V supply. **WLED** for the easy
 audio-reactive path; a small custom firmware for the MQTT state machine.
+
+**The wall panel lands here too** (deferred from H-03, above): the 2.4″ SPI TFT hangs off
+this same board on the same MQTT subscription, so it is one wiring session with the strip.
+Add ₹649 to this phase's budget.
 
 **Every state means something.** Write this table before you write firmware:
 
