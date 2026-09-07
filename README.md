@@ -93,6 +93,10 @@ anything you would miss, and the 2 × 8 GB DDR4-3200 upgrade, which blocks H-08 
 | magi | **Loki** | Logs, 30d retention. No UI of its own — Grafana's Explore is the interface. |
 | magi | **Alloy** | Ships logs to Loki from the docker socket and journald. Replaces Promtail, EOL March 2026. |
 | magi | **Uptime Kuma** | Probes the public hostnames, so it notices a dead cert or lapsed DNS. `status.lab.akhildhyani.me`. |
+| magi | **Authelia** | SSO in front of anything with no login of its own. File-configured, no database. `auth.lab.akhildhyani.me`. |
+| magi | **AdGuard Home** | DNS filtering for the tailnet. Config committed, not clicked — the UI's copy is overwritten on deploy. `dns.lab.akhildhyani.me`. |
+| magi | **Radicale** | Calendar and contacts over CalDAV/CardDAV. Plain `.ics` and `.vcf` on disk. `dav.lab.akhildhyani.me`. |
+| magi | **magi-backup.timer** | Nightly `restic` (R3). Installed but **not enabled** — it refuses to run until the external HDD is mounted, rather than quietly backing up onto the disk it protects. |
 
 Containerised services land here as they come up.
 
