@@ -11,6 +11,16 @@ set -euo pipefail
 STAGE=/var/lib/magi-backup
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
+# Named explicitly so a missing EnvironmentFile says which variable is absent.
+# Without this, `set -u` kills the script with "unbound variable" from inside
+# whichever line happened to touch it first — and for a job that runs
+# unattended at 02:00, the journal line you get is the only thing you have.
+: "${BACKUP_MOUNT:?not set — is /etc/magi/backup.env readable by the unit?}"
+: "${RESTIC_REPOSITORY:?not set — see /etc/magi/backup.env}"
+: "${RESTIC_PASSWORD:?not set — see /etc/magi/backup.env}"
+: "${MQTT_USER:?not set — is /etc/magi/mqtt.env readable by the unit?}"
+: "${MQTT_PASS:?not set — see /etc/magi/mqtt.env}"
+
 pub() {
   # Retained: `state` is a current value, so a subscriber connecting at 03:00
   # learns the world as it is. TOPICS.md, "state is current value, retained".
