@@ -1,0 +1,28 @@
+services:
+  adguardhome:
+    image: adguard/adguardhome:v0.107.79
+    container_name: adguardhome
+    restart: unless-stopped
+    ports:
+      # Bound to the tailnet address, per rule 7. Docker's iptables rules run
+      # ahead of ufw's, so a bare "53:53" would put an open resolver on the
+      # campus LAN — the classic way to end up in someone's DNS amplification
+      # botnet — while ufw still reported default-deny.
+      - "100.94.219.53:53:53/udp"
+      - "100.94.219.53:53:53/tcp"
+    volumes:
+      # Config on the host, not in a volume: AdGuard rewrites this file at
+      # runtime, so it cannot be the read-only copy from the repo. 75-adguard.sh
+      # renders the repo's version here; the repo stays authoritative.
+      - /etc/magi/adguard:/opt/adguardhome/conf
+      # Query log and statistics — large, regenerable, and excluded from restic
+      # for the same reason Loki is.
+      - adguard_work:/opt/adguardhome/work
+    networks: [edge]
+
+networks:
+  edge:
+    external: true
+
+volumes:
+  adguard_work:

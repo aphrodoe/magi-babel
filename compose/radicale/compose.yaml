@@ -1,0 +1,18 @@
+services:
+  radicale:
+    image: tomsquest/docker-radicale:3.8.0.0
+    container_name: radicale
+    restart: unless-stopped
+    # No published port. Caddy reaches it over `edge`.
+    volumes:
+      - ../../config/radicale/config:/config/config:ro
+      - ../../secrets/radicale/users:/config/users:ro
+      - radicale_data:/data
+    networks: [edge]
+
+networks:
+  edge:
+    external: true
+
+volumes:
+  radicale_data:

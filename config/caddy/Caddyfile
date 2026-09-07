@@ -44,6 +44,20 @@
 		reverse_proxy prometheus:9090
 	}
 
+	# Both of these keep their own logins rather than sitting behind Authelia.
+	# AdGuard has real auth already and a second prompt buys nothing; Radicale
+	# must stay on HTTP Basic because CalDAV clients (iOS, DAVx5) cannot follow
+	# a forward-auth redirect — the same trap that breaks the Bitwarden apps.
+	@dns host dns.lab.akhildhyani.me
+	handle @dns {
+		reverse_proxy adguardhome:3000
+	}
+
+	@dav host dav.lab.akhildhyani.me
+	handle @dav {
+		reverse_proxy radicale:5232
+	}
+
 	@status host status.lab.akhildhyani.me
 	handle @status {
 		reverse_proxy uptime-kuma:3001

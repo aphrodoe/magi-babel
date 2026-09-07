@@ -1,0 +1,20 @@
+# Radicale — CalDAV and CardDAV. Chosen over Baikal because its state is plain
+# files on disk rather than a database and a setup wizard, which is the same
+# reason Authelia beat Authentik here.
+
+[server]
+hosts = 0.0.0.0:5232
+
+[auth]
+# Radicale keeps its own htpasswd and is NOT behind Authelia. CalDAV/CardDAV
+# clients — iOS, DAVx5, Thunderbird — speak HTTP Basic and cannot follow a
+# forward-auth redirect to a login page. Exactly the trap that breaks the
+# Bitwarden apps in front of Vaultwarden.
+type = htpasswd
+htpasswd_filename = /config/users
+htpasswd_encryption = bcrypt
+
+[storage]
+# One directory per collection, plain .ics and .vcf inside. Readable with cat,
+# restorable with cp, and diffable — which is most of the argument for Radicale.
+filesystem_folder = /data/collections
