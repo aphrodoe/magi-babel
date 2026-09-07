@@ -22,10 +22,25 @@
 		reverse_proxy grafana:3000
 	}
 
-	# No auth in front of this. It is reachable only from the tailnet, and the
-	# tailnet is one person — revisit if that stops being true.
+	# Authelia's own login UI. Must stay unauthenticated — it is the thing you
+	# get redirected TO.
+	@auth host auth.lab.akhildhyani.me
+	handle @auth {
+		reverse_proxy authelia:9091
+	}
+
+	# Prometheus has no auth of its own, which is why it is the first thing put
+	# behind Authelia rather than the last.
 	@prom host prom.lab.akhildhyani.me
 	handle @prom {
+		# Uptime Kuma probes /-/healthy every 60 s. Redirecting that to a login
+		# page would make the monitor flap red forever, so it is exempt — the
+		# endpoint returns one line and exposes nothing.
+		@needsauth not path /-/healthy
+		forward_auth @needsauth authelia:9091 {
+			uri /api/authz/forward-auth
+			copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
+		}
 		reverse_proxy prometheus:9090
 	}
 
